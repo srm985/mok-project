@@ -21,4 +21,4 @@ See also the list of [contributors](https://github.com/srm985/mok-project/contri
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
+This project is licensed under the MIT License - see the [LICENSE](https://github.com/srm985/mok-project/blob/master/LICENSE) file for details.
