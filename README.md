@@ -3,7 +3,7 @@ The goal of this project is to materialize a well-styled, onscreen keyboard capa
 
 ## Getting Started
 
-~soon to come~
+*soon to come*
 
 ### Prerequisites / Dependencies
 
