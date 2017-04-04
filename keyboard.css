@@ -1,0 +1,16 @@
+.keyboard-row {
+    width: auto;
+    height: auto;
+    margin: 20px 0;
+}
+
+.keyboard-key {
+    display: inline;
+
+    margin: 0 5px;
+    padding: 5px 11px;
+
+    color: #555555;
+    border-radius: 4px;
+    background-color: #E0E0E0;
+}

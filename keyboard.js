@@ -5,7 +5,7 @@
             if (rawFile.readyState === 4) {
                 if (rawFile.status === 200 || rawFile.status == 0) {
                     var rawKeyboardData = rawFile.responseText;
-                    rawKeyboardData = rawKeyboardData.match(/\w+\u0009\w+\u0009[\u0009]?\w+\u0009\w+[@]?\u0009\w+[@]?\u0009[-]?\w+[@]?\u0009[-]?\w+[@]?\u0009\u0009\/\//g);
+                    rawKeyboardData = rawKeyboardData.match(/\w+\u0009\w+\u0009[\u0009]?\w+\u0009\w+[@]?\u0009\w+[@]?\u0009[-]?\w+[@]?(\u0009[-]?\w+[@]?)?\u0009\u0009\/\//g);
                     materializeKeyboard(rawKeyboardData);
                 }
             }
@@ -34,24 +34,41 @@
 
         rowData_4[0] = keyObject[48];
         rowData_4 = rowData_4.concat(keyObject.slice(37, 47));
+
+        generateRow(rowData_1);
+        generateRow(rowData_2);
+        generateRow(rowData_3);
+        generateRow(rowData_4);
     }
 
     function appendKey(keyCode) {
         if (keyCode.length == 4) {
-            $('body').append('<div>&#x' + keyCode + '</div>');
+            $('.keyboard-row:last').append('<div class="keyboard-key">&#x' + keyCode + '</div>');
         } else {
-            $('body').append('<div>' + keyCode + '</div>');
+            $('.keyboard-row:last').append('<div class="keyboard-key">' + keyCode + '</div>');
         }
     }
 
     function generateRow(keyListSplit) {
+        $('body').append('<div class="keyboard-row"></div>');
         $.each(keyListSplit, function(i, value) {
             appendKey(value[3]);
         });
     }
 
+    var file;
+    function languageSwap() {
+        $('.keyboard-row').remove();
+        if(file == 'albanian.klc') {
+            file = 'belarusian.klc';
+        } else {
+            file = 'albanian.klc';
+        }
+        readTextFile(file);
+    }
+
     $(document).ready(function() {
-        var file = 'albanian.klc';
+        file = 'albanian.klc';
         readTextFile(file);
 
         $(document).keydown()
