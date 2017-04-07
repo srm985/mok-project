@@ -68,28 +68,43 @@
         $('.keyboard-row:eq(2)').append('<button class="keyboard-key keyboard-key-lg">Enter</button>');
         $('.keyboard-row:eq(3)').prepend('<button class="keyboard-key keyboard-key-lg">Shift</button>');
         $('.keyboard-row:eq(3)').append('<button class="keyboard-key keyboard-key-lg">Shift</button>');
+        $('.keyboard-wrapper').append('<div class="keyboard-row"></div>');
+        $('.keyboard-row:eq(4)').append('<button class="keyboard-key keyboard-key-lg">Ctrl</button>');
+        $('.keyboard-row:eq(4)').append('<button class="keyboard-key keyboard-key-lg">Settings</button>');
+        $('.keyboard-row:eq(4)').append('<button class="keyboard-key keyboard-key-lg">Alt</button>');
+        $('.keyboard-row:eq(4)').append('<button class="keyboard-key keyboard-key-xl">&nbsp;</button>');
+        $('.keyboard-row:eq(4)').append('<button class="keyboard-key keyboard-key-lg">Alt Grp</button>');
+        $('.keyboard-row:eq(4)').append('<button class="keyboard-key keyboard-key-lg">Ctrl</button>');
+        $('.keyboard-row:eq(4)').append('<button class="keyboard-key keyboard-key-lg">&nbsp;</button>');
     }
 
     function sizeKeys() {
         var rowWidth = $('.keyboard-row').width(),
-            keyPadding = 2 * ($('.keyboard-key').css('padding-right')).match(/[0-9]/),
-            smallKeys, largeKeys, smallKeyConstant = rowWidth / 40,
-            largeKeyWidth;
+            maxKeyCount = 15,
+            keyPadding = 2 * ($('.keyboard-key').css('margin-right')).match(/[0-9]/),
+            smallKeys,
+            largeKeys,
+            xlargeKeys,
+            smallKeyWidth = (rowWidth - (maxKeyCount * keyPadding)) / maxKeyCount,
+            largeKeyWidth,
+            xlargeKeyWidth = rowWidth / 3;
+
         $('.keyboard-row').each(function() {
             smallKeys = $(this).children('.keyboard-key-sm').length;
             largeKeys = $(this).children('.keyboard-key-lg').length;
-            largeKeyWidth = (rowWidth - ((smallKeys + largeKeys) * keyPadding) - (smallKeys * smallKeyConstant)) / largeKeys;
-            console.log((rowWidth - ((smallKeys + largeKeys) * keyPadding) - (smallKeys * smallKeyConstant)));
-            console.log(smallKeys + largeKeys);
-            $('.keyboard-key-sm').width(smallKeyConstant);
-            $('.keyboard-key-lg').width(largeKeyWidth);
+            xlargeKeys = $(this).children('.keyboard-key-xl').length;
+            console.log(smallKeys.toString() + largeKeys.toString() + xlargeKeys.toString());
+            largeKeyWidth = (rowWidth - ((smallKeys + largeKeys + xlargeKeys) * keyPadding) - (smallKeys * smallKeyWidth) - (xlargeKeys * xlargeKeyWidth)) / largeKeys;
+            $(this).children('.keyboard-key-sm').width(smallKeyWidth);
+            $(this).children('.keyboard-key-lg').width(largeKeyWidth);
+            $(this).children('.keyboard-key-xl').width(xlargeKeyWidth);
         });
     }
 
     var file;
 
     function languageSwap() {
-        $('.keyboard-row').remove();
+        $('.keyboard-wrapper').remove();
         if (file == 'albanian.klc') {
             file = 'belarusian.klc';
         } else {

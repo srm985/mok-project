@@ -15,7 +15,9 @@
     display: inline;
     height: 50px;
     margin: 0 5px;
+    padding: 0;
     color: #555555;
+    border: none;
     border-radius: 4px;
     background-color: #E0E0E0;
 }
