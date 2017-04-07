@@ -1,16 +1,25 @@
+.keyboard-wrapper {
+    position: fixed;
+    top: 100px;
+    left: 150px;
+    width: 80%;
+}
+
 .keyboard-row {
-    width: auto;
+    width: 100%;
     height: auto;
     margin: 20px 0;
 }
 
 .keyboard-key {
     display: inline;
-
+    height: 50px;
     margin: 0 5px;
-    padding: 5px 11px;
-
     color: #555555;
     border-radius: 4px;
     background-color: #E0E0E0;
+}
+
+.keyboard-key:focus {
+    outline: none;
 }
