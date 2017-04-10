@@ -42,22 +42,27 @@
         generateRow(rowData_3);
         generateRow(rowData_4);
 
+        setKeys('default');
         keyboardFillout();
         sizeKeys();
     }
 
-    function appendKey(keyCode) {
-        if (keyCode.length == 4) {
-            $('.keyboard-row:last').append('<button class="keyboard-key keyboard-key-sm">&#x' + keyCode + '</button>');
+    function appendKey(keyJSON) {
+        /*if (keyJSON.default.length == 4) {
+            $('.keyboard-row:last').append('<button class="keyboard-key keyboard-key-sm">&#x' + keyJSON.default + '</button>');
         } else {
-            $('.keyboard-row:last').append('<button class="keyboard-key keyboard-key-sm">' + keyCode + '</button>');
-        }
+            $('.keyboard-row:last').append('<button class="keyboard-key keyboard-key-sm">' + keyJSON.default + '</button>');
+        }*/
+        $('.keyboard-row:last').append('<button class="keyboard-key keyboard-key-sm"></button>');
+        $('.keyboard-key:last').data('keyDataJSON', keyJSON);
     }
 
     function generateRow(keyListSplit) {
+        var keyJSON;
         $('.keyboard-wrapper').append('<div class="keyboard-row"></div>');
         $.each(keyListSplit, function(i, value) {
-            appendKey(value[3]);
+            keyJSON = { default: value[3], shift: value[4], altgrp: value[6] };
+            appendKey(keyJSON);
         });
     }
 
@@ -98,6 +103,20 @@
             $(this).children('.keyboard-key-sm').width(smallKeyWidth);
             $(this).children('.keyboard-key-lg').width(largeKeyWidth);
             $(this).children('.keyboard-key-xl').width(xlargeKeyWidth);
+        });
+    }
+
+    function setKeys(keyType) {
+        var keyJSON;
+        $('.keyboard-key').each(function() {
+            keyJSON = $(this).data('keyDataJSON');
+            if (keyJSON.altgrp.length == 4) {
+                $(this).html('&#x' + keyJSON.altgrp);
+            } else if (keyJSON.altgrp == '-1' || keyJSON.altgrp.length == 0 || keyJSON.altgrp.match('@')) {
+                $(this).html('&nbsp;');
+            } else {
+                $(this).html(keyJSON.altgrp);
+            }
         });
     }
 

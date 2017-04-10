@@ -12,6 +12,7 @@
 }
 
 .keyboard-key {
+    font-size: 18px;
     display: inline;
     height: 50px;
     margin: 0 5px;
