@@ -48,11 +48,6 @@
     }
 
     function appendKey(keyJSON) {
-        /*if (keyJSON.default.length == 4) {
-            $('.keyboard-row:last').append('<button class="keyboard-key keyboard-key-sm">&#x' + keyJSON.default + '</button>');
-        } else {
-            $('.keyboard-row:last').append('<button class="keyboard-key keyboard-key-sm">' + keyJSON.default + '</button>');
-        }*/
         $('.keyboard-row:last').append('<button class="keyboard-key keyboard-key-sm"></button>');
         $('.keyboard-key:last').data('keyDataJSON', keyJSON);
     }
@@ -61,7 +56,7 @@
         var keyJSON;
         $('.keyboard-wrapper').append('<div class="keyboard-row"></div>');
         $.each(keyListSplit, function(i, value) {
-            keyJSON = { default: value[3], shift: value[4], altgrp: value[6] };
+            keyJSON = { default: value[3], shift: value[4], altgrp: value[6] == '//' ? '-1' : value[6] };
             appendKey(keyJSON);
         });
     }
@@ -98,7 +93,6 @@
             smallKeys = $(this).children('.keyboard-key-sm').length;
             largeKeys = $(this).children('.keyboard-key-lg').length;
             xlargeKeys = $(this).children('.keyboard-key-xl').length;
-            console.log(smallKeys.toString() + largeKeys.toString() + xlargeKeys.toString());
             largeKeyWidth = (rowWidth - ((smallKeys + largeKeys + xlargeKeys) * keyPadding) - (smallKeys * smallKeyWidth) - (xlargeKeys * xlargeKeyWidth)) / largeKeys;
             $(this).children('.keyboard-key-sm').width(smallKeyWidth);
             $(this).children('.keyboard-key-lg').width(largeKeyWidth);
@@ -110,14 +104,38 @@
         var keyJSON;
         $('.keyboard-key').each(function() {
             keyJSON = $(this).data('keyDataJSON');
-            if (keyJSON.altgrp.length == 4) {
-                $(this).html('&#x' + keyJSON.altgrp);
-            } else if (keyJSON.altgrp == '-1' || keyJSON.altgrp.length == 0 || keyJSON.altgrp.match('@')) {
-                $(this).html('&nbsp;');
-            } else {
-                $(this).html(keyJSON.altgrp);
+            console.log(keyJSON);
+            try {
+                if (keyJSON[keyType].length == 4) {
+                    $(this).html('&#x' + keyJSON[keyType]);
+                } else if (keyJSON[keyType] == '-1' || keyJSON[keyType].length == 0 || keyJSON[keyType].match('@')) {
+                    $(this).html('&nbsp;');
+                } else {
+                    $(this).html(keyJSON[keyType]);
+                }
+            } catch (err) {
+                //
             }
         });
+    }
+
+    function handleKeypress(keyPressed) {
+        if (keyPressed.length > 1) {
+
+            switch (keyPressed) {
+                case 'Shift':
+                    setKeys('shift');
+                    break;
+                case 'Caps Lock':
+                    setKeys('shift');
+                    break;
+                case 'Alt Grp':
+                    setKeys('altgrp');
+                    break;
+            }
+        } else {
+            setKeys('default');
+        }
     }
 
     var file;
@@ -136,5 +154,9 @@
         file = 'albanian.klc';
         readTextFile(file);
 
-        $(document).keydown()
+        $(document).on('click touch', '.keyboard-key', function() {
+            handleKeypress($(this).html());
+        });
+
+        //$(document).keydown();
     })
