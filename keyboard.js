@@ -53,10 +53,10 @@
     }
 
     function generateRow(keyListSplit) {
-        var keyJSON;
+        var keyJSON, capsValue;
         $('.keyboard-wrapper').append('<div class="keyboard-row"></div>');
         $.each(keyListSplit, function(i, value) {
-            keyJSON = { default: value[3], caps: value[4].match(/[A-Z]/) ? value[4] : value[3], shift: value[4], altgrp: value[6] == '//' ? '-1' : value[6] };
+            keyJSON = { default: value[3], shift: value[4], altgrp: value[6] == '//' ? '-1' : value[6] };
             appendKey(keyJSON);
         });
     }
@@ -101,15 +101,20 @@
     }
 
     function setKeys(keyType) {
-        console.log('Key: ' + keyType + ' holdCaps: ' + holdCaps);
         var keyJSON;
-        if (holdCaps) {
-            keyType = 'caps';
+
+        if (keyStatusObject.caps && !keyStatusObject.shift && !keyStatusObject.altgrp) {
+            //keyType = 'caps';
+            keyType = 'default';
             $('.caps-lock-key').addClass('caps-lock-key-active');
-        } else if (!holdCaps) {
-            keyType = keyType == 'caps' ? 'default' : keyType;
+        } else if (!keyStatusObject.caps && !keyStatusObject.shift && !keyStatusObject.altgrp) {
+            keyType = 'default';
+        }
+
+        if (!keyStatusObject.caps) {
             $('.caps-lock-key').removeClass('caps-lock-key-active');
         }
+
         $('.keyboard-key').each(function() {
             try {
                 keyJSON = $(this).data('keyDataJSON');
@@ -123,28 +128,40 @@
             } catch (err) {
                 //
             }
+
+            if (!keyStatusObject.shift && keyStatusObject.caps && !keyStatusObject.altgrp) {
+                $(this).html($(this).html().length == 1 ? $(this).html().toUpperCase() : $(this).html());
+            }
         });
     }
 
-    var holdCaps = false;
+    var keyStatusObject = { shift: false, caps: false, altgrp: false };
 
     function handleKeypress(keyPressed) {
         if (keyPressed.length > 1) {
             switch (keyPressed) {
                 case 'Shift':
-                    holdCaps = false;
+                    keyStatusObject.shift = keyStatusObject.shift ? false : true;
+                    keyStatusObject.caps = false;
+                    keyStatusObject.altgrp = false;
                     setKeys('shift');
                     break;
                 case 'Caps Lock':
-                    holdCaps = holdCaps ? false : true;
+                    keyStatusObject.shift = false;
+                    keyStatusObject.caps = keyStatusObject.caps ? false : true;
+                    keyStatusObject.altgrp = false;
                     setKeys('caps');
                     break;
                 case 'Alt Grp':
-                    holdCaps = false;
+                    keyStatusObject.shift = false;
+                    keyStatusObject.caps = false;
+                    keyStatusObject.altgrp = keyStatusObject.altgrp ? false : true;
                     setKeys('altgrp');
                     break;
             }
         } else {
+            keyStatusObject.shift = false;
+            keyStatusObject.altgrp = false;
             setKeys('default');
         }
     }
