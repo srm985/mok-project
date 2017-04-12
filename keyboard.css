@@ -1,7 +1,7 @@
 .keyboard-wrapper {
     position: fixed;
-    top: 100px;
-    left: 150px;
+    bottom: 10%;
+    left: 10%;
     width: 80%;
 }
 
@@ -25,4 +25,25 @@
 
 .keyboard-key:focus {
     outline: none;
+}
+
+.caps-lock-key {
+    position: relative;
+}
+
+.caps-lock-key:before {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 7px;
+    height: 7px;
+    content: '';
+    transition: background-color 0.05s ease-in-out;
+    border: solid 1px #BDBDBD;
+    border-radius: 50%;
+    background-color: transparent;
+}
+
+.caps-lock-key-active:before {
+    background-color: blue;
 }

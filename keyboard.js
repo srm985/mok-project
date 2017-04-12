@@ -56,7 +56,7 @@
         var keyJSON;
         $('.keyboard-wrapper').append('<div class="keyboard-row"></div>');
         $.each(keyListSplit, function(i, value) {
-            keyJSON = { default: value[3], shift: value[4], altgrp: value[6] == '//' ? '-1' : value[6] };
+            keyJSON = { default: value[3], caps: value[4].match(/[A-Z]/) ? value[4] : value[3], shift: value[4], altgrp: value[6] == '//' ? '-1' : value[6] };
             appendKey(keyJSON);
         });
     }
@@ -64,7 +64,7 @@
     function keyboardFillout() {
         $('.keyboard-row:eq(0)').append('<button class="keyboard-key keyboard-key-lg">Backspace</button>');
         $('.keyboard-row:eq(1)').prepend('<button class="keyboard-key keyboard-key-lg">Tab</button>');
-        $('.keyboard-row:eq(2)').prepend('<button class="keyboard-key keyboard-key-lg">Caps Lock</button>');
+        $('.keyboard-row:eq(2)').prepend('<button class="keyboard-key keyboard-key-lg caps-lock-key">Caps Lock</button>');
         $('.keyboard-row:eq(2)').append('<button class="keyboard-key keyboard-key-lg">Enter</button>');
         $('.keyboard-row:eq(3)').prepend('<button class="keyboard-key keyboard-key-lg">Shift</button>');
         $('.keyboard-row:eq(3)').append('<button class="keyboard-key keyboard-key-lg">Shift</button>');
@@ -101,11 +101,18 @@
     }
 
     function setKeys(keyType) {
+        console.log('Key: ' + keyType + ' holdCaps: ' + holdCaps);
         var keyJSON;
+        if (holdCaps) {
+            keyType = 'caps';
+            $('.caps-lock-key').addClass('caps-lock-key-active');
+        } else if (!holdCaps) {
+            keyType = keyType == 'caps' ? 'default' : keyType;
+            $('.caps-lock-key').removeClass('caps-lock-key-active');
+        }
         $('.keyboard-key').each(function() {
-            keyJSON = $(this).data('keyDataJSON');
-            console.log(keyJSON);
             try {
+                keyJSON = $(this).data('keyDataJSON');
                 if (keyJSON[keyType].length == 4) {
                     $(this).html('&#x' + keyJSON[keyType]);
                 } else if (keyJSON[keyType] == '-1' || keyJSON[keyType].length == 0 || keyJSON[keyType].match('@')) {
@@ -119,17 +126,21 @@
         });
     }
 
+    var holdCaps = false;
+
     function handleKeypress(keyPressed) {
         if (keyPressed.length > 1) {
-
             switch (keyPressed) {
                 case 'Shift':
+                    holdCaps = false;
                     setKeys('shift');
                     break;
                 case 'Caps Lock':
-                    setKeys('shift');
+                    holdCaps = holdCaps ? false : true;
+                    setKeys('caps');
                     break;
                 case 'Alt Grp':
+                    holdCaps = false;
                     setKeys('altgrp');
                     break;
             }
