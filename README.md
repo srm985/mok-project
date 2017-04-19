@@ -21,9 +21,51 @@ $ http-server
 
 _Feel free to disregard these instructions if you have your own preferred server package._
 
-### Prerequisites / Dependencies
+##### Prerequisites / Dependencies
 
 This project was built on jQuery 3.2 and is fed .klc files from Microsoft Keyboard Layout Creator V1.4.
+
+## Usage
+
+To initiate a global instance of the keyboard within your application you may include the following script:
+
+```sh
+<script type="text/javascript">
+    $(document).ready(function() {
+        $(document).keyboard();
+    });
+</script>
+```
+
+Appending the keyboard to a specific element/class/ID will create a listener for all input[type="text"] fields at that element level and all child elements unless the singleInstance option has been set:
+
+```sh
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('div').keyboard();
+        $('.my-div-class').keyboard();
+        $('#my-div-id').keyboard();
+    });
+</script>
+```
+
+If you would like to initiate an instance on a specific element you may include the following script:
+
+```sh
+<script type="text/javascript">
+    $(document).ready(function() {
+        $(your_element).keyboard({
+            'singleInstance': true
+        });
+    });
+</script>
+```
+
+## Options
+
+| Option | Default Value | Information |
+|--------|---------------|-------------|
+| singleInstance | false | Initialize a single instance or globalize. |
 
 ## Versioning
 

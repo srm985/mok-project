@@ -4,11 +4,36 @@
 <head>
     <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
     <script type="text/javascript" src="keyboard.js"></script>
+    <script type="text/javascript" src="keyboard_newest.js"></script>
     <link rel="stylesheet" type="text/css" href="keyboard.css">
+    <script type="text/javascript">
+    $(document).ready(function() {
+        /*var keyboard1 = new keyboard({
+            a: 'true',
+            display: 'worked',
+            test: 22
+        });
+        var keyboard2 = new keyboard({
+            a: 'false',
+            display: 'worked',
+            test: 22
+        });*/
+
+        var keyboardTest = new keyboard();
+
+        keyboardTest.init({
+            a: 'false',
+            display: 'worked',
+            test: 22
+        });
+    });
+    </script>
 </head>
 
 <body>
-	<button onclick="languageSwap();">Language</button>
+    <button onclick="languageSwap();">Language</button>
+    <input type="text" name="">Test1
+    <input type="text" name="">Test2
 </body>
 
 </html>
