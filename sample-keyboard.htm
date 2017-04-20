@@ -8,21 +8,22 @@
     <link rel="stylesheet" type="text/css" href="keyboard.css">
     <script type="text/javascript">
     $(document).ready(function() {
-        /*var keyboard1 = new keyboard({
-            a: 'true',
-            display: 'worked',
-            test: 22
-        });
-        var keyboard2 = new keyboard({
+
+        //var keyboardTest = new keyboard();
+
+        /*keyboardTest.init({
             a: 'false',
             display: 'worked',
             test: 22
         });*/
 
-        var keyboardTest = new keyboard();
-
-        keyboardTest.init({
-            a: 'false',
+        $('input:first').keyboard({
+            a: false,
+            display: 'worked',
+            test: 22
+        });
+        $('input:last').keyboard({
+            a: true,
             display: 'worked',
             test: 22
         });

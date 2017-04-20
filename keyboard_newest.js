@@ -7,8 +7,8 @@
     }
 }*/
 
-keyboard = function() {
-	this.init = function(options) {
-		console.log(options);
-	};
-};
+$.fn.keyboard = function(options) {
+	$(this).on('click touch', function() {
+		console.log('clicked');
+	});
+}
