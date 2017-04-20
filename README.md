@@ -61,11 +61,27 @@ If you would like to initiate an instance on a specific element you may include 
 </script>
 ```
 
-## Options
+### Options
 
 | Option | Default Value | Information |
 |--------|---------------|-------------|
 | singleInstance | false | Initialize a single instance or globalize. |
+| language | 'english' | Given as a string with comma-separated values i.e. 'english, spanish, chinese'. |
+| keyColor | '#E0E0E0' | Defines background color of keys. May pass hex string or specific color i.e. 'blue'. |
+| textColor | '#555555' | Defines text color used on keys. May pass hex string or specific color i.e. 'blue'. |
+
+### Callbacks
+
+| Name | Information |
+|------|-------------|
+| enterKey | Define action of [Enter] key |
+| tabKey | Define action of [Tab] key |
+| ctrlKey | Define action of [Ctrl] key |
+| altKey | Define action of [Alt] key |
+| spareKey | Define action of [Spare] key |
+| settingsKey | Define action of [Settings] key |
+
+_You may change the user-displayed names of any keys without affecting functionality._
 
 ## Versioning
 

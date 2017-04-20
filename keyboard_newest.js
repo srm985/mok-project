@@ -15,23 +15,31 @@ $.fn.keyboard = function(options) {
 
     var keyStatusObject = { shift: false, caps: false, altgrp: false },
         pageElement = $(this),
-        focusedInputField;
+        focusedInputField,
+        languageList;
 
     options = {
-        language: typeof options.language === 'undefined' ? 'english' : options.language,
-        keyColor: typeof options.keyColor === 'undefined' ? '#E0E0E0' : options.keyColor,
-        textColor: typeof options.textColor === 'undefined' ? '#555555' : options.textColor,
-        enterKey: typeof options.enterKey === 'undefined' ? '' : options.enterKey,
-        tabKey: typeof options.tabKey === 'undefined' ? '' : options.tabKey,
-        ctrlKey: typeof options.ctrlKey === 'undefined' ? '' : options.ctrlKey,
-        altKey: typeof options.altKey === 'undefined' ? '' : options.altKey,
-        settingsKey: typeof options.settingsKey === 'undefined' ? '' : options.settingsKey
+        language: typeof(options.language) === 'undefined' ? 'english' : options.language.split(','),
+        keyColor: typeof(options.keyColor) === 'undefined' ? '#E0E0E0' : options.keyColor,
+        textColor: typeof(options.textColor) === 'undefined' ? '#555555' : options.textColor,
+        capsLightColor: typeof(options.capsLightColor) === 'undefined' ? '#163EFF' : options.capsLightColor,
+        enterKey: typeof(options.enterKey) === 'undefined' ? '' : options.enterKey,
+        tabKey: typeof(options.tabKey) === 'undefined' ? '' : options.tabKey,
+        ctrlKey: typeof(options.ctrlKey) === 'undefined' ? '' : options.ctrlKey,
+        altKey: typeof(options.altKey) === 'undefined' ? '' : options.altKey,
+        spareKey: typeof(options.spareKey) === 'undefined' ? '' : options.spareKey,
+        settingsKey: typeof(options.settingsKey) === 'undefined' ? '' : options.settingsKey
     };
+
+    //*****Quick cleanup of our language array.*****
+    $.each(options.language, function(i, val) {
+        options.language[i] = val.trim();
+    });
 
     init();
 
     function init() {
-        readKeyboardFile(options.language + '.klc');
+        readKeyboardFile(options.language[1] + '.klc');
 
         //*****Add our event listeners once everything has been materialized.*****
         pageElement.on('focus', function() {
@@ -66,6 +74,7 @@ $.fn.keyboard = function(options) {
             }
         }
         rawFile.send(null);*/
+
         $.get('/languages/' + file, function(data) {
             data = data.match(/\w+\u0009\w+\u0009[\u0009]?\w+\u0009\w+[@]?\u0009\w+[@]?\u0009[-]?\w+[@]?(\u0009[-]?\w+[@]?)?\u0009\u0009\/\//g);
             materializeKeyboard(data);
@@ -147,7 +156,7 @@ $.fn.keyboard = function(options) {
         $('.keyboard-row:eq(4)').append('<button class="keyboard-key keyboard-key-xl" data-keyval="space">&nbsp;</button>');
         $('.keyboard-row:eq(4)').append('<button class="keyboard-key keyboard-key-lg" data-keyval="alt grp">Alt Grp</button>');
         $('.keyboard-row:eq(4)').append('<button class="keyboard-key keyboard-key-lg" data-keyval="ctrl">Ctrl</button>');
-        $('.keyboard-row:eq(4)').append('<button class="keyboard-key keyboard-key-lg" data-keyval="">&nbsp;</button>');
+        $('.keyboard-row:eq(4)').append('<button class="keyboard-key keyboard-key-lg" data-keyval="spare">&nbsp;</button>');
     }
 
     //***********************************************************************************
@@ -277,6 +286,12 @@ $.fn.keyboard = function(options) {
                         options.settingsKey();
                     }
                     break;
+                case 'spare':
+                    //User-definable callback.
+                    if (options.spareKey && typeof(options.spareKey) === 'function') {
+                        optionsspareKey();
+                    }
+                    break;
             }
         } else {
             keyStatusObject.shift = false;
@@ -290,7 +305,8 @@ $.fn.keyboard = function(options) {
     //*                Provide some styling options for our keyboard.                   *
     //***********************************************************************************
     function styleKeyboard() {
-    	$('.keyboard-key').css('background-color', options.keyColor);
-    	$('.keyboard-key').css('color', options.textColor);
+        $('.keyboard-key').css('background-color', options.keyColor);
+        $('.keyboard-key').css('color', options.textColor);
+        console.log(options.capsLightColor);
     }
 }
