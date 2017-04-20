@@ -24,13 +24,9 @@ $.fn.keyboard = function(options) {
         enterKey: typeof options.enterKey === 'undefined' ? '' : options.enterKey,
         tabKey: typeof options.tabKey === 'undefined' ? '' : options.tabKey,
         ctrlKey: typeof options.ctrlKey === 'undefined' ? '' : options.ctrlKey,
-       	altKey: typeof options.altKey === 'undefined' ? '' : options.altKey,
+        altKey: typeof options.altKey === 'undefined' ? '' : options.altKey,
         settingsKey: typeof options.settingsKey === 'undefined' ? '' : options.settingsKey
     };
-
-    /*$(this).on('click touch', function() {
-        console.log(typeof options.display === 'undefined');
-    });*/
 
     init();
 
@@ -58,8 +54,8 @@ $.fn.keyboard = function(options) {
     }
 
     function readKeyboardFile(file) {
-        var rawFile = new XMLHttpRequest();
-        rawFile.open("GET", file, true);
+        /*var rawFile = new XMLHttpRequest();
+        rawFile.open("GET", '/languages/' + file, true);
         rawFile.onreadystatechange = function() {
             if (rawFile.readyState === 4) {
                 if (rawFile.status === 200 || rawFile.status == 0) {
@@ -69,7 +65,11 @@ $.fn.keyboard = function(options) {
                 }
             }
         }
-        rawFile.send(null);
+        rawFile.send(null);*/
+        $.get('/languages/' + file, function(data) {
+            data = data.match(/\w+\u0009\w+\u0009[\u0009]?\w+\u0009\w+[@]?\u0009\w+[@]?\u0009[-]?\w+[@]?(\u0009[-]?\w+[@]?)?\u0009\u0009\/\//g);
+            materializeKeyboard(data);
+        });
     }
 
     //***********************************************************************************
@@ -107,6 +107,7 @@ $.fn.keyboard = function(options) {
         setKeys('default');
         keyboardFillout();
         sizeKeys();
+        styleKeyboard();
     }
 
     //***********************************************************************************
@@ -283,5 +284,13 @@ $.fn.keyboard = function(options) {
             setKeys('default');
             focusedInputField.val(focusedInputField.val() + keyPressed);
         }
+    }
+
+    //***********************************************************************************
+    //*                Provide some styling options for our keyboard.                   *
+    //***********************************************************************************
+    function styleKeyboard() {
+    	$('.keyboard-key').css('background-color', options.keyColor);
+    	$('.keyboard-key').css('color', options.textColor);
     }
 }

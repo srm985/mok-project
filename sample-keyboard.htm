@@ -8,21 +8,14 @@
     <script type="text/javascript">
     $(document).ready(function() {
 
-        //var keyboardTest = new keyboard();
-
-        /*keyboardTest.init({
-            a: 'false',
-            display: 'worked',
-            test: 22
-        });*/
-        file = 'albanian.klc';
-
         $('input:first').keyboard({
             language: 'albanian',
             enterKey: function() {
             	alert();
             },
-            settingsKey: 'test'
+            settingsKey: 'test',
+            keyColor: '',
+            textColor: ''
         });
     });
     </script>
