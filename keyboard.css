@@ -1,8 +1,8 @@
 .keyboard-wrapper {
     position: fixed;
-    bottom: 10%;
-    left: 10%;
-    width: 80%;
+    width: calc(100% - 40px);
+    min-width: 1024px;
+    max-width: 1100px;
 }
 
 .keyboard-row {

@@ -69,6 +69,7 @@ If you would like to initiate an instance on a specific element you may include 
 | language | 'english' | Given as a string with comma-separated values i.e. 'english, spanish, chinese'. |
 | keyColor | '#E0E0E0' | Defines background color of keys. May pass hex string or specific color i.e. 'blue'. |
 | textColor | '#555555' | Defines text color used on keys. May pass hex string or specific color i.e. 'blue'. |
+| keyboardPosition | 'bottom' | Locate the keyboard at page 'top', 'middle', or 'bottom' with a default edge padding of 20px. |
 
 ### Callbacks
 
