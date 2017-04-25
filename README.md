@@ -23,7 +23,7 @@ _Feel free to disregard these instructions if you have your own preferred server
 
 ##### Prerequisites / Dependencies
 
-This project was built on jQuery 3.2 and is fed .klc files from Microsoft Keyboard Layout Creator V1.4.
+This project was built on jQuery 3.2 and is fed .klc files from [Microsoft Keyboard Layout Creator](https://www.microsoft.com/en-us/download/details.aspx?id=22339) V1.4.
 
 ## Usage
 
@@ -80,7 +80,7 @@ If you would like to initiate an instance on a specific element you may include 
 | ctrlKey | Define action of [Ctrl] key |
 | altKey | Define action of [Alt] key |
 | spareKey | Define action of [Spare] key |
-| settingsKey | Define action of [Settings] key |
+| languageKey | Define action of [Language] key |
 
 _You may change the user-displayed names of any keys without affecting functionality._
 
@@ -90,7 +90,7 @@ We use [SemVer](http://semver.org/) for versioning.
 
 ## Authors
 
-* **Sean McQuay** - *Initial work* - [srm985](https://github.com/srm985)
+* **Sean McQuay** - *Initial work* - [GitHub](https://github.com/srm985) - [Website](http://www.seanmcquay.com)
 
 See also the list of [contributors](https://github.com/srm985/mok-project/contributors) who participated in this project.
 
