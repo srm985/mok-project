@@ -13,7 +13,7 @@
 
 $.fn.keyboard = function(options) {
 
-    var keyStatusObject = { shift: false, caps: false, altgrp: false },
+    var keyStatusObject = { shift: false, caps: false, altgrp: false, shift_altgrp: '' },
         pageElement = $(this),
         focusedInputField,
         languageList,
@@ -80,7 +80,7 @@ $.fn.keyboard = function(options) {
         deadkeyObject = '';
 
         $.get('/languages/' + file + '.klc', function(data) {
-            keyData = data.match(/\w+\u0009\w+\u0009[\u0009]?\w+\u0009\w+[@]?\u0009\w+[@]?\u0009[-]?\w+[@]?(\u0009[-]?\w+[@]?)?\u0009\u0009\/\//g);
+            keyData = data.match(/\w+\u0009\w+\u0009[\u0009]?\w+\u0009\w+[@]?\u0009\w+[@]?\u0009[-]?\w+[@]?(\u0009[-]?\w+[@]?)?(\u0009[-]?\w+[@]?)?\u0009\u0009\/\//g);
             deadkeyLocation = data.indexOf('DEADKEY');
             if (deadkeyLocation > 0) {
                 deadkeyData = data.slice(deadkeyLocation, data.indexOf('KEYNAME')).trim().split('DEADKEY');
@@ -156,7 +156,7 @@ $.fn.keyboard = function(options) {
         var keyObject, capsValue;
         $('.keyboard-wrapper').append('<div class="keyboard-row"></div>');
         $.each(keyListSplit, function(i, value) {
-            keyObject = { default: value[3], shift: value[4], altgrp: value[6] == '//' ? '-1' : value[6] };
+            keyObject = { default: value[3], shift: value[4], altgrp: value[6] == '//' ? '-1' : value[6], shift_altgrp: (value[7] == '//' || value[7] === undefined) ? '-1' : value[7] };
             appendKey(keyObject);
         });
     }
@@ -212,8 +212,8 @@ $.fn.keyboard = function(options) {
     function setKeys(keyType) {
         var keyObject;
 
+        //*****Set keyboard to default and capitalize letters.*****
         if (keyStatusObject.caps && !keyStatusObject.shift && !keyStatusObject.altgrp) {
-            //keyType = 'caps';
             keyType = 'default';
             $('.caps-lock-key').addClass('caps-lock-key-active');
         } else if (!keyStatusObject.caps && !keyStatusObject.shift && !keyStatusObject.altgrp) {
@@ -222,6 +222,11 @@ $.fn.keyboard = function(options) {
 
         if (!keyStatusObject.caps) {
             $('.caps-lock-key').removeClass('caps-lock-key-active');
+        }
+
+        //*****If we didn't just press [Shift] + [Alt Grp], clear our tracker.*****
+        if (keyStatusObject.shift_altgrp != '' && keyType != 'shift_altgrp') {
+            keyStatusObject.shift_altgrp = '';
         }
 
         $('.keyboard-key').each(function() {
@@ -262,7 +267,13 @@ $.fn.keyboard = function(options) {
                     keyStatusObject.shift = keyStatusObject.shift ? false : true;
                     keyStatusObject.caps = false;
                     keyStatusObject.altgrp = false;
-                    setKeys('shift');
+                    if (keyStatusObject.shift_altgrp == 'altgrp') {
+                        setKeys('shift_altgrp');
+                        keyStatusObject.shift_altgrp = '';
+                    } else {
+                        setKeys('shift');
+                        keyStatusObject.shift_altgrp = 'shift';
+                    }
                     break;
                 case 'caps lock':
                     keyStatusObject.shift = false;
@@ -274,7 +285,13 @@ $.fn.keyboard = function(options) {
                     keyStatusObject.shift = false;
                     keyStatusObject.caps = false;
                     keyStatusObject.altgrp = keyStatusObject.altgrp ? false : true;
-                    setKeys('altgrp');
+                    if (keyStatusObject.shift_altgrp == 'shift') {
+                        setKeys('shift_altgrp');
+                        keyStatusObject.shift_altgrp = '';
+                    } else {
+                        setKeys('altgrp');
+                        keyStatusObject.shift_altgrp = 'altgrp';
+                    }
                     break;
                 case 'backspace':
                     focusedInputField.val(focusedInputField.val().slice(0, -1));
