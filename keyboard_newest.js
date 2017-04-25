@@ -81,7 +81,8 @@ $.fn.keyboard = function(options) {
         deadkeyObject = '';
 
         $.get('/languages/' + file + '.klc', function(data) {
-            keyData = data.match(/\w+\u0009\w+\u0009[\u0009]?\w+\u0009[-]?(\w+|%%)[@]?\u0009(\w+|%%)[@]?\u0009[-]?(\w+|%%)[@]?(\u0009[-]?(\w+|%%)[@]?)?(\u0009[-]?(\w+|%%)[@]?)?\u0009\u0009\/\//g);
+            keyData = data.match(/\w+\u0009\w+\u0009[\u0009]?\w+\u0009([-]?\w+|%%)[@]?\u0009([-]?\w+|%%)[@]?\u0009([-]?\w+|%%)[@]?(\u0009([-]?\w+|%%)[@]?)?(\u0009([-]?\w+|%%)[@]?)?(\u0009([-]?\w+|%%)[@]?)?\u0009\u0009\/\//g);
+            console.log(keyData);
             deadkeyLocation = data.indexOf('DEADKEY');
             if (deadkeyLocation > 0) {
                 deadkeyData = data.slice(deadkeyLocation, data.indexOf('KEYNAME')).trim().split('DEADKEY');
@@ -124,15 +125,15 @@ $.fn.keyboard = function(options) {
             keyObject[i] = value.toString().split(/\u0009+/g);
         });
 
-        rowData_1[0] = keyObject[35];
+        rowData_1[0] = keyObject[35] === undefined ? '-1' : keyObject[35];
         rowData_1 = rowData_1.concat(keyObject.slice(0, 12));
 
         rowData_2 = rowData_2.concat(keyObject.slice(12, 24));
-        rowData_2.push(keyObject[36]);
+        rowData_2.push(keyObject[36] === undefined ? '-1' : keyObject[36]);
 
         rowData_3 = rowData_3.concat(keyObject.slice(24, 35));
 
-        rowData_4[0] = keyObject[48];
+        rowData_4[0] = keyObject[48] === undefined ? '-1' : keyObject[48];
         rowData_4 = rowData_4.concat(keyObject.slice(37, 47));
 
         destroyKeyboard();
@@ -165,7 +166,7 @@ $.fn.keyboard = function(options) {
         var keyObject, capsValue;
         $('.keyboard-wrapper').append('<div class="keyboard-row"></div>');
         $.each(keyListSplit, function(i, value) {
-            keyObject = { default: value[3], shift: value[4], altgrp: value[6] == '//' ? '-1' : value[6], shift_altgrp: (value[7] == '//' || value[7] === undefined) ? '-1' : value[7] };
+            keyObject = { default: (value[3] == '//' || value[3] == '-1' || value[3] === undefined) ? '-1' : value[3], shift: (value[4] == '//' || value[4] == '-1' || value[4] === undefined) ? '-1' : value[4], altgrp: (value[6] == '//' || value[6] == '-1' || value[6] === undefined) ? '-1' : value[6], shift_altgrp: (value[7] == '//' || value[7] == '-1' || value[7] === undefined) ? '-1' : value[7] };
             appendKey(keyObject);
         });
     }
