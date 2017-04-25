@@ -18,7 +18,10 @@ $.fn.keyboard = function(options) {
         focusedInputField,
         languageList,
         resizeTimerActive = false,
-        languageArrayPosition;
+        languageArrayPosition,
+        deadkeyObject,
+        deadkeyPressed = '',
+        deadkeySet = false;
 
     //*****Find all of our default options defined here.*****
     options = {
@@ -71,7 +74,10 @@ $.fn.keyboard = function(options) {
         var keyData,
             deadkeyData,
             deadkeyLocation = '',
-            deadkeyJSON = '';
+            tempArr = new Array(),
+            tempObject;
+
+        deadkeyObject = '';
 
         $.get('/languages/' + file + '.klc', function(data) {
             keyData = data.match(/\w+\u0009\w+\u0009[\u0009]?\w+\u0009\w+[@]?\u0009\w+[@]?\u0009[-]?\w+[@]?(\u0009[-]?\w+[@]?)?\u0009\u0009\/\//g);
@@ -80,12 +86,16 @@ $.fn.keyboard = function(options) {
                 deadkeyData = data.slice(deadkeyLocation, data.indexOf('KEYNAME')).trim().split('DEADKEY');
                 deadkeyData.splice(0, 1);
                 $.each(deadkeyData, function(i, value) {
-                    deadkeyJSON += '"' + value.trim().slice(0, 4) + '": "' + 1 + '", ';
+                    tempArr = value.split(/\n/g);
+                    tempArr.splice(0, 2);
+                    tempObject = '';
+                    $.each(tempArr, function(_i, _value) {
+                        tempObject += '"' + _value.trim().slice(0, 4) + '": "' + _value.trim().slice(5, 9) + '", ';
+                    });
+                    tempObject = '{' + tempObject.slice(0, -2) + '}';
+                    deadkeyObject += '"' + value.trim().slice(0, 4) + '": ' + tempObject + ', ';
                 });
-                deadkeyJSON = deadkeyJSON.slice(0, -2);
-                deadkeyJSON = '{' + deadkeyJSON + '}';
-                deadkeyJSON = JSON.parse(deadkeyJSON);
-                console.log(deadkeyJSON);
+                deadkeyObject = JSON.parse('{' + deadkeyObject.slice(0, -2) + '}');
             }
             materializeKeyboard(keyData);
         });
@@ -132,22 +142,22 @@ $.fn.keyboard = function(options) {
     }
 
     //***********************************************************************************
-    //*                  Append each key's individual JSON object.                      *
+    //*                    Append each key's individual object.                         *
     //***********************************************************************************
-    function appendKey(keyJSON) {
+    function appendKey(keyObject) {
         $('.keyboard-row:last').append('<button class="keyboard-key keyboard-key-sm"></button>');
-        $('.keyboard-key:last').data('keyDataJSON', keyJSON);
+        $('.keyboard-key:last').data('keyDataObject', keyObject);
     }
 
     //***********************************************************************************
     //*                    Create row wrapper and fill with keys.                       *
     //***********************************************************************************
     function generateRow(keyListSplit) {
-        var keyJSON, capsValue;
+        var keyObject, capsValue;
         $('.keyboard-wrapper').append('<div class="keyboard-row"></div>');
         $.each(keyListSplit, function(i, value) {
-            keyJSON = { default: value[3], shift: value[4], altgrp: value[6] == '//' ? '-1' : value[6] };
-            appendKey(keyJSON);
+            keyObject = { default: value[3], shift: value[4], altgrp: value[6] == '//' ? '-1' : value[6] };
+            appendKey(keyObject);
         });
     }
 
@@ -200,7 +210,7 @@ $.fn.keyboard = function(options) {
     //*                Cycle key values based on depressed function keys.               *
     //***********************************************************************************
     function setKeys(keyType) {
-        var keyJSON;
+        var keyObject;
 
         if (keyStatusObject.caps && !keyStatusObject.shift && !keyStatusObject.altgrp) {
             //keyType = 'caps';
@@ -216,18 +226,18 @@ $.fn.keyboard = function(options) {
 
         $('.keyboard-key').each(function() {
             try {
-                keyJSON = $(this).data('keyDataJSON');
-                if (keyJSON[keyType].length == 4) {
-                    $(this).html('&#x' + keyJSON[keyType] + ';');
+                keyObject = $(this).data('keyDataObject');
+                if (keyObject[keyType].length == 4) {
+                    $(this).html('&#x' + keyObject[keyType] + ';');
                     $(this).data('keyval', $(this).html());
-                } else if (keyJSON[keyType].length == 5 && keyJSON[keyType].match('@')) {
-                    $(this).html('&#x' + keyJSON[keyType].replace('@', '') + ';');
+                } else if (keyObject[keyType].length == 5 && keyObject[keyType].match('@')) {
+                    $(this).html('&#x' + keyObject[keyType].replace('@', '') + ';');
                     $(this).data('keyval', $(this).html());
-                } else if (keyJSON[keyType] == '-1' || keyJSON[keyType].length == 0) {
+                } else if (keyObject[keyType] == '-1' || keyObject[keyType].length == 0) {
                     $(this).html('&nbsp;');
                     $(this).data('keyval', '');
                 } else {
-                    $(this).html(keyJSON[keyType]);
+                    $(this).html(keyObject[keyType]);
                     $(this).data('keyval', $(this).html());
                 }
             } catch (err) {
@@ -246,6 +256,7 @@ $.fn.keyboard = function(options) {
     function handleKeypress(keyPressed) {
         keyPressed = keyPressed.replace('&lt;', '<').replace('&gt;', '>').replace(/\bspace/, ' '); //Acount for &lt; and &gt; escaping.
         if (keyPressed.length > 1) {
+            deadkeyPressed = '';
             switch (keyPressed) {
                 case 'shift':
                     keyStatusObject.shift = keyStatusObject.shift ? false : true;
@@ -296,7 +307,6 @@ $.fn.keyboard = function(options) {
                     }
                     break;
                 case 'language':
-                    console.log(languageArrayPosition);
                     if (languageArrayPosition + 1 <= options.language.length - 1) {
                         languageArrayPosition++;
                     } else {
@@ -316,9 +326,23 @@ $.fn.keyboard = function(options) {
                     break;
             }
         } else {
+            //*****Convert deadkey to hex and pad with zeros to ensure it's four digits.*****
+            var deadkeyLookup = ('0000' + keyPressed.charCodeAt(0).toString(16)).slice(-4);
+
             keyStatusObject.shift = false;
             keyStatusObject.altgrp = false;
             setKeys('default');
+            deadkeyPressed = deadkeyObject[deadkeyLookup];
+            if (deadkeyPressed || deadkeySet) {
+                keyPressed = '';
+                if (deadkeyPressed === undefined && deadkeySet) {
+                    var combinedKey = String.fromCharCode('0x' + deadkeySet[deadkeyLookup]);
+                    if (combinedKey && deadkeySet[deadkeyLookup] !== undefined) {
+                        keyPressed = combinedKey;
+                    }
+                }
+                deadkeySet = deadkeyPressed;
+            }
             focusedInputField.val(focusedInputField.val() + keyPressed);
         }
     }
@@ -339,9 +363,6 @@ $.fn.keyboard = function(options) {
                 break;
             case 'middle':
                 $('.keyboard-wrapper').css('top', ((viewportHeight - keyboardHeight) / 2).toString() + 'px');
-                console.log(viewportHeight);
-                console.log(keyboardHeight);
-                console.log(((viewportHeight - keyboardHeight) / 2).toString() + 'px');
                 break;
             default:
                 $('.keyboard-wrapper').css('bottom', '20px');
