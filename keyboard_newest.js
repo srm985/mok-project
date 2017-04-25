@@ -21,7 +21,8 @@ $.fn.keyboard = function(options) {
         languageArrayPosition,
         deadkeyObject,
         deadkeyPressed = '',
-        deadkeySet = false;
+        deadkeySet = false,
+        textFlowDirection = 'LTR';
 
     //*****Find all of our default options defined here.*****
     options = {
@@ -80,7 +81,7 @@ $.fn.keyboard = function(options) {
         deadkeyObject = '';
 
         $.get('/languages/' + file + '.klc', function(data) {
-            keyData = data.match(/\w+\u0009\w+\u0009[\u0009]?\w+\u0009\w+[@]?\u0009\w+[@]?\u0009[-]?\w+[@]?(\u0009[-]?\w+[@]?)?(\u0009[-]?\w+[@]?)?\u0009\u0009\/\//g);
+            keyData = data.match(/\w+\u0009\w+\u0009[\u0009]?\w+\u0009[-]?(\w+|%%)[@]?\u0009(\w+|%%)[@]?\u0009[-]?(\w+|%%)[@]?(\u0009[-]?(\w+|%%)[@]?)?(\u0009[-]?(\w+|%%)[@]?)?\u0009\u0009\/\//g);
             deadkeyLocation = data.indexOf('DEADKEY');
             if (deadkeyLocation > 0) {
                 deadkeyData = data.slice(deadkeyLocation, data.indexOf('KEYNAME')).trim().split('DEADKEY');
@@ -97,6 +98,14 @@ $.fn.keyboard = function(options) {
                 });
                 deadkeyObject = JSON.parse('{' + deadkeyObject.slice(0, -2) + '}');
             }
+
+            //*****Reverse input direction for specific languages.*****
+            if (file == 'arabic') {
+                textFlowDirection = 'RTL';
+            } else {
+                textFlowDirection = 'LTR';
+            }
+
             materializeKeyboard(keyData);
         });
     }
@@ -238,7 +247,7 @@ $.fn.keyboard = function(options) {
                 } else if (keyObject[keyType].length == 5 && keyObject[keyType].match('@')) {
                     $(this).html('&#x' + keyObject[keyType].replace('@', '') + ';');
                     $(this).data('keyval', $(this).html());
-                } else if (keyObject[keyType] == '-1' || keyObject[keyType].length == 0) {
+                } else if (keyObject[keyType] == '-1' || keyObject[keyType] == '%%' || keyObject[keyType].length == 0) {
                     $(this).html('&nbsp;');
                     $(this).data('keyval', '');
                 } else {
@@ -360,6 +369,7 @@ $.fn.keyboard = function(options) {
                 }
                 deadkeySet = deadkeyPressed;
             }
+            focusedInputField.attr('dir', textFlowDirection);
             focusedInputField.val(focusedInputField.val() + keyPressed);
         }
     }
