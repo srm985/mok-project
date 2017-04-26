@@ -13,7 +13,8 @@
 
 $.fn.keyboard = function(options) {
 
-    var keyStatusObject = { shift: false, caps: false, altgrp: false, shift_altgrp: '' },
+    var keyMap = { 'OEM_3': 0, '1': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9, '0': 10, 'OEM_MINUS': 11, 'OEM_PLUS': 12, 'Q': 13, 'W': 14, 'E': 15, 'R': 16, 'T': 17, 'Y': 18, 'U': 19, 'I': 20, 'O': 21, 'P': 22, 'OEM_4': 23, 'OEM_6': 24, 'OEM_102': 25, 'A': 26, 'S': 27, 'D': 28, 'F': 29, 'G': 30, 'H': 31, 'J': 32, 'K': 33, 'L': 34, 'OEM_1': 35, 'OEM_7': 36, 'Z': 37, 'X': 38, 'C': 39, 'V': 40, 'B': 41, 'N': 42, 'M': 43, 'OEM_COMMA': 44, 'OEM_PERIOD': 45, 'OEM_2': 46 },
+        keyStatusObject = { shift: false, caps: false, altgrp: false, shift_altgrp: '' },
         pageElement = $(this),
         focusedInputField,
         languageList,
@@ -82,7 +83,6 @@ $.fn.keyboard = function(options) {
 
         $.get('/languages/' + file + '.klc', function(data) {
             keyData = data.match(/\w+\u0009\w+\u0009[\u0009]?\w+\u0009([-]?\w+|%%)[@]?\u0009([-]?\w+|%%)[@]?\u0009([-]?\w+|%%)[@]?(\u0009([-]?\w+|%%)[@]?)?(\u0009([-]?\w+|%%)[@]?)?(\u0009([-]?\w+|%%)[@]?)?\u0009\u0009\/\//g);
-            console.log(keyData);
             deadkeyLocation = data.indexOf('DEADKEY');
             if (deadkeyLocation > 0) {
                 deadkeyData = data.slice(deadkeyLocation, data.indexOf('KEYNAME')).trim().split('DEADKEY');
@@ -117,15 +117,28 @@ $.fn.keyboard = function(options) {
     function materializeKeyboard(keyListString) {
         var keyList = keyListString.toString().split(','),
             keyObject = new Array(),
+            keyMapArray = new Array(47),
             rowData_1 = new Array(),
             rowData_2 = new Array(),
             rowData_3 = new Array(),
             rowData_4 = new Array();
+
         $.each(keyList, function(i, value) {
             keyObject[i] = value.toString().split(/\u0009+/g);
+            if (keyMap[keyObject[i][1]] !== undefined) {
+                keyMapArray[keyMap[keyObject[i][1]]] = keyObject[i];
+            }
+            //keyMap[keyObject[i][1]] = keyObject[i];
         });
 
-        rowData_1[0] = keyObject[35] === undefined ? '-1' : keyObject[35];
+        console.log(keyMapArray);
+
+        rowData_1 = keyMapArray.slice(0, 13);
+        rowData_2 = keyMapArray.slice(13, 26);
+        rowData_3 = keyMapArray.slice(26, 37);
+        rowData_4 = keyMapArray.slice(37, 47);
+
+        /*rowData_1[0] = keyObject[35] === undefined ? '-1' : keyObject[35];
         rowData_1 = rowData_1.concat(keyObject.slice(0, 12));
 
         rowData_2 = rowData_2.concat(keyObject.slice(12, 24));
@@ -134,7 +147,7 @@ $.fn.keyboard = function(options) {
         rowData_3 = rowData_3.concat(keyObject.slice(24, 35));
 
         rowData_4[0] = keyObject[48] === undefined ? '-1' : keyObject[48];
-        rowData_4 = rowData_4.concat(keyObject.slice(37, 47));
+        rowData_4 = rowData_4.concat(keyObject.slice(37, 47));*/
 
         destroyKeyboard();
 
@@ -166,7 +179,11 @@ $.fn.keyboard = function(options) {
         var keyObject, capsValue;
         $('.keyboard-wrapper').append('<div class="keyboard-row"></div>');
         $.each(keyListSplit, function(i, value) {
-            keyObject = { default: (value[3] == '//' || value[3] == '-1' || value[3] === undefined) ? '-1' : value[3], shift: (value[4] == '//' || value[4] == '-1' || value[4] === undefined) ? '-1' : value[4], altgrp: (value[6] == '//' || value[6] == '-1' || value[6] === undefined) ? '-1' : value[6], shift_altgrp: (value[7] == '//' || value[7] == '-1' || value[7] === undefined) ? '-1' : value[7] };
+            if (value !== undefined) {
+                keyObject = { default: (value[3] == '//' || value[3] == '-1' || value[3] === undefined) ? '-1' : value[3], shift: (value[4] == '//' || value[4] == '-1' || value[4] === undefined) ? '-1' : value[4], altgrp: (value[6] == '//' || value[6] == '-1' || value[6] === undefined) ? '-1' : value[6], shift_altgrp: (value[7] == '//' || value[7] == '-1' || value[7] === undefined) ? '-1' : value[7] };
+            } else {
+                keyObject = { default: '-1', shift: '-1', altgrp: '-1', shift_altgrp: '-1' };
+            }
             appendKey(keyObject);
         });
     }
