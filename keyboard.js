@@ -274,6 +274,9 @@ $.fn.keyboard = function(options) {
                     if (keyStatusObject.shift_altgrp == 'altgrp') {
                         setKeys('shift_altgrp');
                         keyStatusObject.shift_altgrp = '';
+                    } else if (keyStatusObject.shift_altgrp == 'shift') {
+                        setKeys('shift');
+                        keyStatusObject.shift_altgrp = '';
                     } else {
                         setKeys('shift');
                         keyStatusObject.shift_altgrp = 'shift';
@@ -291,6 +294,9 @@ $.fn.keyboard = function(options) {
                     keyStatusObject.altgrp = keyStatusObject.altgrp ? false : true;
                     if (keyStatusObject.shift_altgrp == 'shift') {
                         setKeys('shift_altgrp');
+                        keyStatusObject.shift_altgrp = '';
+                    } else if (keyStatusObject.shift_altgrp == 'altgrp') {
+                        setKeys('altgrp');
                         keyStatusObject.shift_altgrp = '';
                     } else {
                         setKeys('altgrp');
