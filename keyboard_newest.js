@@ -13,7 +13,7 @@
 
 $.fn.keyboard = function(options) {
 
-    var keyMap = { 'OEM_3': 0, '1': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9, '0': 10, 'OEM_MINUS': 11, 'OEM_PLUS': 12, 'Q': 13, 'W': 14, 'E': 15, 'R': 16, 'T': 17, 'Y': 18, 'U': 19, 'I': 20, 'O': 21, 'P': 22, 'OEM_4': 23, 'OEM_6': 24, 'OEM_102': 25, 'A': 26, 'S': 27, 'D': 28, 'F': 29, 'G': 30, 'H': 31, 'J': 32, 'K': 33, 'L': 34, 'OEM_1': 35, 'OEM_7': 36, 'Z': 37, 'X': 38, 'C': 39, 'V': 40, 'B': 41, 'N': 42, 'M': 43, 'OEM_COMMA': 44, 'OEM_PERIOD': 45, 'OEM_2': 46 },
+    var keyMap = { '29': 0, '02': 1, '03': 2, '04': 3, '05': 4, '06': 5, '07': 6, '08': 7, '09': 8, '0a': 9, '0b': 10, '0c': 11, '0d': 12, '10': 13, '11': 14, '12': 15, '13': 16, '14': 17, '15': 18, '16': 19, '17': 20, '18': 21, '19': 22, '1a': 23, '1b': 24, '2b': 25, '1e': 26, '1f': 27, '20': 28, '21': 29, '22': 30, '23': 31, '24': 32, '25': 33, '26': 34, '27': 35, '28': 36, '2c': 37, '2d': 38, '2e': 39, '2f': 40, '30': 41, '31': 42, '32': 43, '33': 44, '34': 45, '35': 46 },
         keyStatusObject = { shift: false, caps: false, altgrp: false, shift_altgrp: '' },
         pageElement = $(this),
         focusedInputField,
@@ -117,46 +117,23 @@ $.fn.keyboard = function(options) {
     function materializeKeyboard(keyListString) {
         var keyList = keyListString.toString().split(','),
             keyObject = new Array(),
-            keyMapArray = new Array(47),
-            rowData_1 = new Array(),
-            rowData_2 = new Array(),
-            rowData_3 = new Array(),
-            rowData_4 = new Array();
+            keyMapArray = new Array(47);
 
         $.each(keyList, function(i, value) {
             keyObject[i] = value.toString().split(/\u0009+/g);
-            if (keyMap[keyObject[i][1]] !== undefined) {
-                keyMapArray[keyMap[keyObject[i][1]]] = keyObject[i];
+            if (keyMap[keyObject[i][0]] !== undefined) {
+                keyMapArray[keyMap[keyObject[i][0]]] = keyObject[i];
             }
-            //keyMap[keyObject[i][1]] = keyObject[i];
         });
-
-        console.log(keyMapArray);
-
-        rowData_1 = keyMapArray.slice(0, 13);
-        rowData_2 = keyMapArray.slice(13, 26);
-        rowData_3 = keyMapArray.slice(26, 37);
-        rowData_4 = keyMapArray.slice(37, 47);
-
-        /*rowData_1[0] = keyObject[35] === undefined ? '-1' : keyObject[35];
-        rowData_1 = rowData_1.concat(keyObject.slice(0, 12));
-
-        rowData_2 = rowData_2.concat(keyObject.slice(12, 24));
-        rowData_2.push(keyObject[36] === undefined ? '-1' : keyObject[36]);
-
-        rowData_3 = rowData_3.concat(keyObject.slice(24, 35));
-
-        rowData_4[0] = keyObject[48] === undefined ? '-1' : keyObject[48];
-        rowData_4 = rowData_4.concat(keyObject.slice(37, 47));*/
 
         destroyKeyboard();
 
         $('body').append('<div class="keyboard-wrapper"></div>');
 
-        generateRow(rowData_1);
-        generateRow(rowData_2);
-        generateRow(rowData_3);
-        generateRow(rowData_4);
+        generateRow(keyMapArray.slice(0, 13));
+        generateRow(keyMapArray.slice(13, 26));
+        generateRow(keyMapArray.slice(26, 37));
+        generateRow(keyMapArray.slice(37, 47));
 
         setKeys('default');
         keyboardFillout();
