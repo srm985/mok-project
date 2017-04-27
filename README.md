@@ -32,9 +32,7 @@ To initiate an instance of the keyboard within your application you may include 
 ```sh
 <script type="text/javascript">
     $(document).ready(function() {
-        $('#my-element').keyboard({
-            language: 'english'
-        });
+        $(document).keyboard();
     });
 </script>
 ```
@@ -43,7 +41,7 @@ To initiate an instance of the keyboard within your application you may include 
 
 | Option | Default Value | Information |
 |--------|---------------|-------------|
-| singleInstance | false | Initialize a single instance or globalize. |
+| inputType | 'text, textarea, number, password, search, tel, url' | May pass individual input types or comma-separated values. This is valid for both global and local instances. |
 | language | 'english' | Given as a string with comma-separated values i.e. 'english, spanish, chinese'. |
 | keyColor | '#E0E0E0' | Defines background color of keys. May pass hex string or specific color i.e. 'blue'. |
 | textColor | '#555555' | Defines text color used on keys. May pass hex string or specific color i.e. 'blue'. |

@@ -8,26 +8,28 @@
     <script type="text/javascript">
     $(document).ready(function() {
 
-        $('input:first').keyboard({
-            language: 'english, punjabi, arabic, vietnamese',
+        $(document).keyboard({
+            language: 'english, punjabi, vietnamese, arabic',
             enterKey: function() {
-            	alert();
+                alert();
             },
             settingsKey: 'test',
             keyColor: '',
             textColor: '',
-            capsLightColor: 'red',
-            keyboardPosition: 'bottom'
+            keyboardPosition: 'bottom',
         });
 
     });
     </script>
     <title>MOK Project - Sample</title>
+    <link rel="icon" href="favicon.ico">
 </head>
 
 <body>
-    Input 1<input type="text" name="">
-    Input 2<input type="text" name="">
+    <label>Input 1:</label>
+    <input type="text" name="">
+    <label>Input 2:</label>
+    <input type="password" name="">
 </body>
 
 </html>

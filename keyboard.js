@@ -30,14 +30,15 @@ $.fn.keyboard = function(options) {
         language: typeof(options.language) === 'undefined' ? 'english' : options.language,
         keyColor: typeof(options.keyColor) === 'undefined' ? '#E0E0E0' : options.keyColor,
         textColor: typeof(options.textColor) === 'undefined' ? '#555555' : options.textColor,
-        capsLightColor: typeof(options.capsLightColor) === 'undefined' ? '#163EFF' : options.capsLightColor,
+        capsLightColor: typeof(options.capsLightColor) === 'undefined' ? '#3498DB' : options.capsLightColor,
         enterKey: typeof(options.enterKey) === 'undefined' ? '' : options.enterKey,
         tabKey: typeof(options.tabKey) === 'undefined' ? '' : options.tabKey,
         ctrlKey: typeof(options.ctrlKey) === 'undefined' ? '' : options.ctrlKey,
         altKey: typeof(options.altKey) === 'undefined' ? '' : options.altKey,
         spareKey: typeof(options.spareKey) === 'undefined' ? '' : options.spareKey,
         languageKey: typeof(options.languageKey) === 'undefined' ? '' : options.languageKey,
-        keyboardPosition: typeof(options.keyboardPosition) === 'undefined' ? 'bottom' : options.keyboardPosition
+        keyboardPosition: typeof(options.keyboardPosition) === 'undefined' ? 'bottom' : options.keyboardPosition,
+        inputType: setInputType(options.inputType)
     };
 
     //*****Quick cleanup of our language array.*****
@@ -46,30 +47,61 @@ $.fn.keyboard = function(options) {
         options.language[i] = val.trim();
     });
 
+    //***********************************************************************************
+    //*             Return our selected input types as a formatted string.              *
+    //***********************************************************************************
+    function setInputType(inputType) {
+        var inputTypeArray = new Array(),
+            formattedString = '';
+
+        if (inputType !== undefined && inputType != '') {
+            inputTypeArray = inputType.trim().split(',');
+            $.each(inputTypeArray, function(i, value) {
+                formattedString += 'input[type="' + value.trim().toString() + '"], ';
+            });
+            formattedString = formattedString.slice(0, -2);
+        } else {
+            formattedString = 'input[type="text"], input[type="textarea"], input[type="number"], input[type="password"], input[type="search"], input[type="tel"], input[type="url"]';
+        }
+        return (formattedString);
+    }
+
     init();
 
     function init() {
+        var inputFieldLabel = '';
+
         languageArrayPosition = 0;
+
         readKeyboardFile(options.language[languageArrayPosition]);
 
         //*****Add our event listeners once everything has been materialized.*****
-        pageElement.on('focus', function() {
+        pageElement.on('focus', options.inputType, function() {
+            if ($(this).prop('class') != 'keyboard-input-field') {
+                focusedInputField = $(this);
+                $('.keyboard-input-field').val(focusedInputField.val())
+            }
             $('.keyboard-wrapper').show();
-            focusedInputField = $(this);
-        });
-
-        pageElement.on('blur', function() {
-            //$('.keyboard-wrapper').hide();
+            //$('.keyboard-input-field').focus();
         });
 
         //*****Listen for keypresses.*****
         $(document).on('click touch', '.keyboard-key', function() {
             handleKeypress($(this).data('keyval'));
         });
-    }
 
-    function selectKeyboardFile(params) {
+        //*****Handle our keyboard close button.*****
+        $(document).on('click touch', '.keyboard-cancel-button', function() {
+            $('.keyboard-input-field').val('');
+            $('.keyboard-wrapper').hide();
+        });
 
+        //*****Handle our keyboard accept button.*****
+        $(document).on('click touch', '.keyboard-accept-button', function() {
+            focusedInputField.val($('.keyboard-input-field').val());
+            $('.keyboard-input-field').val('');
+            $('.keyboard-wrapper').hide();
+        });
     }
 
     function readKeyboardFile(file) {
@@ -126,9 +158,11 @@ $.fn.keyboard = function(options) {
             }
         });
 
-        destroyKeyboard();
-
-        $('body').append('<div class="keyboard-wrapper"></div>');
+        if ($('.keyboard-wrapper').length) {
+            destroyKeys();
+        } else {
+            $('body').append('<div class="keyboard-wrapper"></div>');
+        }
 
         generateRow(keyMapArray.slice(0, 13));
         generateRow(keyMapArray.slice(13, 26));
@@ -169,6 +203,9 @@ $.fn.keyboard = function(options) {
     //*      Append our extra function keys that we didn't get from the .klc file.      *
     //***********************************************************************************
     function keyboardFillout() {
+        if (!$('.keyboard-action-wrapper').length) {
+            $('.keyboard-wrapper').prepend('<div class="keyboard-action-wrapper"><button class="keyboard-action-button keyboard-cancel-button">Cancel</button><input type="text" class="keyboard-input-field"><button class="keyboard-action-button keyboard-accept-button">Accept</button></div>');
+        }
         $('.keyboard-row:eq(0)').append('<button class="keyboard-key keyboard-key-lg" data-keyval="backspace">Backspace</button>');
         $('.keyboard-row:eq(1)').prepend('<button class="keyboard-key keyboard-key-lg" data-keyval="tab">Tab</button>');
         $('.keyboard-row:eq(2)').prepend('<button class="keyboard-key keyboard-key-lg caps-lock-key" data-keyval="caps lock">Caps Lock</button>');
@@ -370,8 +407,12 @@ $.fn.keyboard = function(options) {
                 }
                 deadkeySet = deadkeyPressed;
             }
-            focusedInputField.attr('dir', textFlowDirection);
-            focusedInputField.val(focusedInputField.val() + keyPressed);
+
+            //focusedInputField.attr('dir', textFlowDirection);
+            //focusedInputField.val(focusedInputField.val() + keyPressed);
+
+            $('.keyboard-input-field').attr('dir', textFlowDirection);
+            $('.keyboard-input-field').val($('.keyboard-input-field').val() + keyPressed);
         }
     }
 
@@ -406,6 +447,13 @@ $.fn.keyboard = function(options) {
     }
 
     //***********************************************************************************
+    //*                      Strip keys from keyboard element.                          *
+    //***********************************************************************************
+    function destroyKeys() {
+        $('.keyboard-row').remove();
+    }
+
+    //***********************************************************************************
     //*                         Listen for window resizing.                             *
     //***********************************************************************************
     $(window).resize(function() {
@@ -413,7 +461,6 @@ $.fn.keyboard = function(options) {
         if (!resizeTimerActive) {
             resizeTimerActive = true;
             var resizeDelay = setTimeout(function() {
-                destroyKeyboard();
                 init();
                 resizeTimerActive = false;
             }, 500);
