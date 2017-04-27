@@ -4,6 +4,8 @@
 //*                                                                                 *
 //*            Author: Sean McQuay (www.seanmcquay.com)                             *
 //*                                                                                 *
+//*            GitHub: https://github.com/srm985/mok-project                        *
+//*                                                                                 *
 //*            Started: March 2017                                                  *
 //*            Version: 0                                                           *
 //*                                                                                 *
@@ -23,7 +25,8 @@ $.fn.keyboard = function(options) {
         deadkeyObject,
         deadkeyPressed = '',
         deadkeySet = false,
-        textFlowDirection = 'LTR';
+        textFlowDirection = 'LTR',
+        keyboardOpen = false;
 
     //*****Find all of our default options defined here.*****
     options = {
@@ -57,11 +60,15 @@ $.fn.keyboard = function(options) {
         if (inputType !== undefined && inputType != '') {
             inputTypeArray = inputType.trim().split(',');
             $.each(inputTypeArray, function(i, value) {
-                formattedString += 'input[type="' + value.trim().toString() + '"], ';
+                if (value.trim().toString() == 'contenteditable') {
+                    formattedString += 'td[contenteditable="true"], ';
+                } else {
+                    formattedString += 'input[type="' + value.trim().toString() + '"], ';
+                }
             });
             formattedString = formattedString.slice(0, -2);
         } else {
-            formattedString = 'input[type="text"], input[type="textarea"], input[type="number"], input[type="password"], input[type="search"], input[type="tel"], input[type="url"]';
+            formattedString = 'input[type="text"], input[type="textarea"], input[type="number"], input[type="password"], input[type="search"], input[type="tel"], input[type="url"], td[contenteditable="true"]';
         }
         return (formattedString);
     }
@@ -76,13 +83,25 @@ $.fn.keyboard = function(options) {
         readKeyboardFile(options.language[languageArrayPosition]);
 
         //*****Add our event listeners once everything has been materialized.*****
-        pageElement.on('focus', options.inputType, function() {
+        pageElement.on('focus click touch', options.inputType, function() {
             if ($(this).prop('class') != 'keyboard-input-field') {
                 focusedInputField = $(this);
-                $('.keyboard-input-field').val(focusedInputField.val())
+                if (focusedInputField.is('td')) {
+                    $('.keyboard-input-field').val(focusedInputField.html());
+                    $('.keyboard-input-field').prop('type', 'text');
+                } else {
+                    $('.keyboard-input-field').val(focusedInputField.val());
+                    $('.keyboard-input-field').prop('type', focusedInputField.prop('type'));
+                }
+                $('.keyboard-blackout-background').show();
+                $('.keyboard-wrapper').show();
+                keyboardOpen = true;
+                try {
+                    $('.keyboard-input-field').focus();
+                } catch (err) {
+                    console.log($(this).prop('class'));
+                }
             }
-            $('.keyboard-wrapper').show();
-            //$('.keyboard-input-field').focus();
         });
 
         //*****Listen for keypresses.*****
@@ -92,15 +111,23 @@ $.fn.keyboard = function(options) {
 
         //*****Handle our keyboard close button.*****
         $(document).on('click touch', '.keyboard-cancel-button', function() {
-            $('.keyboard-input-field').val('');
-            $('.keyboard-wrapper').hide();
+            discardData();
         });
 
         //*****Handle our keyboard accept button.*****
         $(document).on('click touch', '.keyboard-accept-button', function() {
-            focusedInputField.val($('.keyboard-input-field').val());
-            $('.keyboard-input-field').val('');
-            $('.keyboard-wrapper').hide();
+            acceptData();
+        });
+
+        //*****Provide a little functionality during external keyboard testing.*****
+        $(document).keypress(function(e) {
+            if (e.which == 13 && $('.keyboard-wrapper').is(':visible')) {
+                acceptData();
+                e.preventDefault();
+            } else if (e.which == 27 && $('.keyboard-wrapper').is(':visible')) {
+                discardData();
+                e.preventDefault();
+            }
         });
     }
 
@@ -160,8 +187,10 @@ $.fn.keyboard = function(options) {
 
         if ($('.keyboard-wrapper').length) {
             destroyKeys();
+            keyboardWrapperPresent = true;
         } else {
-            $('body').append('<div class="keyboard-wrapper"></div>');
+            $('body').prepend('<div class="keyboard-blackout-background"></div><div class="keyboard-wrapper"></div>');
+            keyboardWrapperPresent = false;
         }
 
         generateRow(keyMapArray.slice(0, 13));
@@ -173,6 +202,11 @@ $.fn.keyboard = function(options) {
         keyboardFillout();
         sizeKeys();
         keyboardAttributes();
+
+        if (!keyboardOpen) {
+            $('.keyboard-blackout-background').hide();
+            $('.keyboard-wrapper').hide();
+        }
     }
 
     //***********************************************************************************
@@ -417,6 +451,29 @@ $.fn.keyboard = function(options) {
     }
 
     //***********************************************************************************
+    //*                       Discard keyboard data and close.                          *
+    //***********************************************************************************
+    function discardData() {
+        $('.keyboard-input-field').val('');
+        $('.keyboard-wrapper').hide();
+        $('.keyboard-blackout-background').hide();
+    }
+
+    //***********************************************************************************
+    //*                   Submit keyboard data to form and close.                       *
+    //***********************************************************************************
+    function acceptData() {
+        if (focusedInputField.is('td')) {
+            focusedInputField.html($('.keyboard-input-field').val());
+        } else {
+            focusedInputField.val($('.keyboard-input-field').val());
+        }
+        $('.keyboard-input-field').val('');
+        $('.keyboard-wrapper').hide();
+        $('.keyboard-blackout-background').hide();
+    }
+
+    //***********************************************************************************
     //*                Provide some styling options for our keyboard.                   *
     //***********************************************************************************
     function keyboardAttributes() {
@@ -444,6 +501,7 @@ $.fn.keyboard = function(options) {
     //***********************************************************************************
     function destroyKeyboard() {
         $('.keyboard-wrapper').remove();
+        keyboardOpen = false;
     }
 
     //***********************************************************************************
@@ -451,6 +509,7 @@ $.fn.keyboard = function(options) {
     //***********************************************************************************
     function destroyKeys() {
         $('.keyboard-row').remove();
+        keyboardOpen = false;
     }
 
     //***********************************************************************************

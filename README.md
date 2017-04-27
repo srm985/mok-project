@@ -23,7 +23,7 @@ _Feel free to disregard these instructions if you have your own preferred server
 
 ##### Prerequisites / Dependencies
 
-This project was built on jQuery 3.2 and is fed .klc files from [Microsoft Keyboard Layout Creator](https://www.microsoft.com/en-us/download/details.aspx?id=22339) V1.4.
+This project was built and tested on jQuery 3.2 and is fed .klc files from [Microsoft Keyboard Layout Creator](https://www.microsoft.com/en-us/download/details.aspx?id=22339) V1.4.
 
 ## Usage
 
@@ -41,7 +41,7 @@ To initiate an instance of the keyboard within your application you may include 
 
 | Option | Default Value | Information |
 |--------|---------------|-------------|
-| inputType | 'text, textarea, number, password, search, tel, url' | May pass individual input types or comma-separated values. This is valid for both global and local instances. |
+| inputType | 'text, textarea, number, password, search, tel, url, contenteditable' | May pass individual input types or comma-separated values. This is valid for both global and local instances. |
 | language | 'english' | Given as a string with comma-separated values i.e. 'english, spanish, chinese'. |
 | keyColor | '#E0E0E0' | Defines background color of keys. May pass hex string or specific color i.e. 'blue'. |
 | textColor | '#555555' | Defines text color used on keys. May pass hex string or specific color i.e. 'blue'. |
