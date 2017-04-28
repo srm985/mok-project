@@ -22,6 +22,7 @@ $.fn.keyboard = function(options) {
         languageList,
         resizeTimerActive = false,
         languageArrayPosition,
+        shiftStateObject,
         deadkeyObject,
         deadkeyPressed = '',
         deadkeySet = false,
@@ -134,15 +135,22 @@ $.fn.keyboard = function(options) {
 
     function readKeyboardFile(file) {
         var keyData,
+            shiftStateData,
+            shiftStateLocation,
             deadkeyData,
             deadkeyLocation = '',
             tempArr = new Array(),
             tempObject;
 
+        shiftStateObject = '';
         deadkeyObject = '';
 
         $.get('/languages/' + file + '.klc', function(data) {
+
+            //*****Extract our keyboard key data.*****
             keyData = data.match(/\w+\u0009\w+\u0009[\u0009]?\w+\u0009([-]?\w+|%%)[@]?\u0009([-]?\w+|%%)[@]?\u0009([-]?\w+|%%)[@]?(\u0009([-]?\w+|%%)[@]?)?(\u0009([-]?\w+|%%)[@]?)?(\u0009([-]?\w+|%%)[@]?)?\u0009\u0009\/\//g);
+
+            //*****Extract our deadkey data and convert to lookup table.*****
             deadkeyLocation = data.indexOf('DEADKEY');
             if (deadkeyLocation > 0) {
                 deadkeyData = data.slice(deadkeyLocation, data.indexOf('KEYNAME')).trim().split('DEADKEY');
@@ -158,6 +166,30 @@ $.fn.keyboard = function(options) {
                     deadkeyObject += '"' + value.trim().slice(0, 4) + '": ' + tempObject + ', ';
                 });
                 deadkeyObject = JSON.parse('{' + deadkeyObject.slice(0, -2) + '}');
+            }
+
+            //*****Extract our shift state data and convert to lookup table.*****
+            shiftStateLocation = data.indexOf('SHIFTSTATE');
+            if (shiftStateLocation > 0) {
+                shiftStateData = data.slice(shiftStateLocation, data.indexOf('LAYOUT')).trim().split(/\n/g);
+                shiftStateData.splice(0, 2);
+                $.each(shiftStateData, function(i, value) {
+                    if (value.indexOf(':') == -1) {
+                        shiftStateObject += '"default": ';
+                    } else if (value.indexOf('Shft  Ctrl Alt') != -1) {
+                        shiftStateObject += '"shift_altgrp": ';
+                    } else if (value.indexOf('Shft  Ctrl') != -1) {
+                        shiftStateObject += '"ctrl_shift": ';
+                    } else if (value.indexOf('Ctrl Alt') != -1) {
+                        shiftStateObject += '"altgrp": ';
+                    } else if (value.indexOf('Ctrl') != -1) {
+                        shiftStateObject += '"ctrl": ';
+                    } else if (value.indexOf('Shft') != -1) {
+                        shiftStateObject += '"shift": ';
+                    }
+                    shiftStateObject += value.match(/\w{6} [0-9]/).toString().slice(-1) + ', ';
+                });
+                shiftStateObject = JSON.parse('{' + shiftStateObject.toString().slice(0, -2) + '}');
             }
 
             //*****Reverse input direction for specific languages.*****
@@ -226,7 +258,8 @@ $.fn.keyboard = function(options) {
         $('.keyboard-wrapper').append('<div class="keyboard-row"></div>');
         $.each(keyListSplit, function(i, value) {
             if (value !== undefined) {
-                keyObject = { default: (value[3] == '//' || value[3] == '-1' || value[3] === undefined) ? '-1' : value[3], shift: (value[4] == '//' || value[4] == '-1' || value[4] === undefined) ? '-1' : value[4], altgrp: (value[6] == '//' || value[6] == '-1' || value[6] === undefined) ? '-1' : value[6], shift_altgrp: (value[7] == '//' || value[7] == '-1' || value[7] === undefined) ? '-1' : value[7] };
+                //keyObject = { default: (value[3] == '//' || value[3] == '-1' || value[3] === undefined) ? '-1' : value[3], shift: (value[4] == '//' || value[4] == '-1' || value[4] === undefined) ? '-1' : value[4], altgrp: (value[6] == '//' || value[6] == '-1' || value[6] === undefined) ? '-1' : value[6], shift_altgrp: (value[7] == '//' || value[7] == '-1' || value[7] === undefined) ? '-1' : value[7] };
+                keyObject = { default: value[shiftStateObject.default - 1] === undefined ? '-1' : value[shiftStateObject.default - 1], shift: value[shiftStateObject.shift - 1] === undefined ? '-1' : value[shiftStateObject.shift - 1], altgrp: value[shiftStateObject.altgrp - 1] === undefined ? '-1' : value[shiftStateObject.altgrp - 1], shift_altgrp: value[shiftStateObject.shift_altgrp - 1] === undefined ? '-1' : value[shiftStateObject.shift_altgrp - 1]};
             } else {
                 keyObject = { default: '-1', shift: '-1', altgrp: '-1', shift_altgrp: '-1' };
             }
