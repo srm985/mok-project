@@ -50,6 +50,7 @@ To initiate an instance of the keyboard within your application you may include 
 | acceptTextColor | '#FFFFFF' | Defines text color of accept button. May pass hex string or specific color i.e. 'white'. |
 | keyColor | '#E0E0E0' | Defines background color of keys. May pass hex string or specific color i.e. 'blue'. |
 | keyTextColor | '#555555' | Defines text color used on keys. May pass hex string or specific color i.e. 'blue'. |
+| blackoutColor | '25, 25, 25, 0.9' | Defines color and opacity of blackout background. Passed as RGBA string. |
 
 
 ### Callbacks
@@ -67,7 +68,9 @@ _You may change the user-displayed names of any keys without affecting functiona
 
 ## Bugs
 
-This keyboard does not yet fully support ligature in layouts such as punjabi, gujarati, etc...
+I'm not certain if ligature support is fully functioning for keyboards such as Hindi, Punjabi, Arabic, etc...
+
+This initial release is not intended to be mobile friendly. It's original scope was intended for those devices such as terminals. It is the intention to provide mobile support at a later time.
 
 ## Versioning
 

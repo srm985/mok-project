@@ -47,7 +47,8 @@ $.fn.keyboard = function(options) {
         cancelColor: typeof(options.cancelColor) === 'undefined' ? '#E74C3C' : options.cancelColor,
         cancelTextColor: typeof(options.cancelTextColor) === 'undefined' ? '#FFFFFF' : options.cancelTextColor,
         acceptColor: typeof(options.acceptColor) === 'undefined' ? '#2ECC71' : options.acceptColor,
-        acceptTextColor: typeof(options.acceptTextColor) === 'undefined' ? '#FFFFFF' : options.acceptTextColor
+        acceptTextColor: typeof(options.acceptTextColor) === 'undefined' ? '#FFFFFF' : options.acceptTextColor,
+        blackoutColor: typeof(options.blackoutColor) === 'undefined' ? '25, 25, 25, 0.9' : options.blackoutColor,
     };
 
     //*****Quick cleanup of our language array.*****
@@ -358,7 +359,9 @@ $.fn.keyboard = function(options) {
     //*                Cycle key values based on depressed function keys.               *
     //***********************************************************************************
     function setKeys(keyType) {
-        var keyObject;
+        var currentKey,
+            keyObject,
+            tempString = '';
 
         //*****Set keyboard to default and capitalize letters.*****
         if (keyStatusObject.caps && !keyStatusObject.shift && !keyStatusObject.altgrp) {
@@ -378,20 +381,28 @@ $.fn.keyboard = function(options) {
         }
 
         $('.keyboard-key').each(function() {
+            tempString = '';
             try {
-                keyObject = $(this).data('keyDataObject');
+                currentKey = $(this)
+                keyObject = currentKey.data('keyDataObject');
                 if (keyObject[keyType].length == 4) {
-                    $(this).html('&#x' + keyObject[keyType] + ';');
-                    $(this).data('keyval', $(this).html());
+                    currentKey.html('&#x' + keyObject[keyType] + ';');
+                    currentKey.data('keyval', currentKey.html());
                 } else if (keyObject[keyType].length == 5 && keyObject[keyType].match('@')) {
-                    $(this).html('&#x' + keyObject[keyType].replace('@', '') + ';');
-                    $(this).data('keyval', $(this).html());
+                    currentKey.html('&#x' + keyObject[keyType].replace('@', '') + ';');
+                    currentKey.data('keyval', currentKey.html());
+                } else if (keyObject[keyType].constructor === Array) {
+                    $.each(keyObject[keyType], function(i, value) {
+                        tempString += '&#x' + value + ';';
+                    });
+                    currentKey.html(tempString);
+                    currentKey.data('keyval', currentKey.html());
                 } else if (keyObject[keyType] == '-1' || keyObject[keyType] == '%%' || keyObject[keyType].length == 0) {
-                    $(this).html('&nbsp;');
-                    $(this).data('keyval', '');
+                    currentKey.html('&nbsp;');
+                    currentKey.data('keyval', '');
                 } else {
-                    $(this).html(keyObject[keyType]);
-                    $(this).data('keyval', $(this).html());
+                    currentKey.html(keyObject[keyType]);
+                    currentKey.data('keyval', currentKey.html());
                 }
             } catch (err) {
                 //
@@ -413,7 +424,7 @@ $.fn.keyboard = function(options) {
 
         keyPressed = keyPressed.replace('&lt;', '<').replace('&gt;', '>').replace(/\bspace/, ' '); //Acount for &lt; and &gt; escaping.
 
-        if (keyPressed.length > 1) {
+        if (keyPressed.length > 2) {
             deadkeyPressed = '';
             switch (keyPressed) {
                 case 'shift':
@@ -571,6 +582,7 @@ $.fn.keyboard = function(options) {
         $('.keyboard-cancel-button').css('color', options.cancelTextColor);
         $('.keyboard-accept-button').css('background-color', options.acceptColor);
         $('.keyboard-accept-button').css('color', options.acceptTextColor);
+        $('.keyboard-blackout-background').css('background-color', 'rgba(' + options.blackoutColor + ')');
         switch (options.keyboardPosition) {
             case 'top':
                 $('.keyboard-wrapper').css('top', '20px');
