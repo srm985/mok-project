@@ -24,6 +24,7 @@ $.fn.keyboard = function(options) {
         languageArrayPosition,
         shiftStateObject,
         deadkeyObject,
+        ligatureObject,
         deadkeyPressed = '',
         deadkeySet = false,
         textFlowDirection = 'LTR',
@@ -136,37 +137,22 @@ $.fn.keyboard = function(options) {
     function readKeyboardFile(file) {
         var keyData,
             shiftStateData,
-            shiftStateLocation,
+            shiftStateLocation = '',
             deadkeyData,
             deadkeyLocation = '',
+            ligatureData,
+            ligatureLocation = '',
             tempArr = new Array(),
             tempObject;
 
         shiftStateObject = '';
         deadkeyObject = '';
+        ligatureObject = '';
 
         $.get('/languages/' + file + '.klc', function(data) {
 
             //*****Extract our keyboard key data.*****
             keyData = data.match(/\w+\u0009\w+\u0009[\u0009]?\w+\u0009([-]?\w+|%%)[@]?\u0009([-]?\w+|%%)[@]?\u0009([-]?\w+|%%)[@]?(\u0009([-]?\w+|%%)[@]?)?(\u0009([-]?\w+|%%)[@]?)?(\u0009([-]?\w+|%%)[@]?)?\u0009\u0009\/\//g);
-
-            //*****Extract our deadkey data and convert to lookup table.*****
-            deadkeyLocation = data.indexOf('DEADKEY');
-            if (deadkeyLocation > 0) {
-                deadkeyData = data.slice(deadkeyLocation, data.indexOf('KEYNAME')).trim().split('DEADKEY');
-                deadkeyData.splice(0, 1);
-                $.each(deadkeyData, function(i, value) {
-                    tempArr = value.split(/\n/g);
-                    tempArr.splice(0, 2);
-                    tempObject = '';
-                    $.each(tempArr, function(_i, _value) {
-                        tempObject += '"' + _value.trim().slice(0, 4) + '": "' + _value.trim().slice(5, 9) + '", ';
-                    });
-                    tempObject = '{' + tempObject.slice(0, -2) + '}';
-                    deadkeyObject += '"' + value.trim().slice(0, 4) + '": ' + tempObject + ', ';
-                });
-                deadkeyObject = JSON.parse('{' + deadkeyObject.slice(0, -2) + '}');
-            }
 
             //*****Extract our shift state data and convert to lookup table.*****
             shiftStateLocation = data.indexOf('SHIFTSTATE');
@@ -190,6 +176,44 @@ $.fn.keyboard = function(options) {
                     shiftStateObject += value.match(/\w{6} [0-9]/).toString().slice(-1) + ', ';
                 });
                 shiftStateObject = JSON.parse('{' + shiftStateObject.toString().slice(0, -2) + '}');
+            }
+
+            //*****Extract our deadkey data and convert to lookup table.*****
+            deadkeyLocation = data.indexOf('DEADKEY');
+            if (deadkeyLocation > 0) {
+                deadkeyData = data.slice(deadkeyLocation, data.indexOf('KEYNAME')).trim().split('DEADKEY');
+                deadkeyData.splice(0, 1);
+                $.each(deadkeyData, function(i, value) {
+                    tempArr = value.split(/\n/g);
+                    tempArr.splice(0, 2);
+                    tempObject = '';
+                    $.each(tempArr, function(_i, _value) {
+                        tempObject += '"' + _value.trim().slice(0, 4) + '": "' + _value.trim().slice(5, 9) + '", ';
+                    });
+                    tempObject = '{' + tempObject.slice(0, -2) + '}';
+                    deadkeyObject += '"' + value.trim().slice(0, 4) + '": ' + tempObject + ', ';
+                });
+                deadkeyObject = JSON.parse('{' + deadkeyObject.slice(0, -2) + '}');
+            }
+
+            //*****Extract our ligature-generated keys and convert to lookup table.*****
+            ligatureLocation = data.indexOf('LIGATURE');
+            if (ligatureLocation > 0) {
+                ligatureData = data.slice(ligatureLocation, data.indexOf('KEYNAME')).trim().split(/\n/g);
+                ligatureData.splice(0, 5);
+                $.each(ligatureData, function(i, value) {
+                    if (value.indexOf('//') > 0) {
+                        ligatureData[i] = value.trim().split('//')[0].trim().replace(/\t/g, ' ').replace('  ', ' ').replace('  ', ' ').split(' ');
+                        ligatureData[i].splice(1, 1);
+                        ligatureObject += '"' + ligatureData[i][0] + '": ';
+                        ligatureData[i].splice(0, 1);
+                        $.each(ligatureData[i], function(j, _value) {
+                            ligatureData[i][j] = '"' + _value + '"';
+                        });
+                        ligatureObject += '[' + ligatureData[i] + '], ';
+                    }
+                });
+                ligatureObject = JSON.parse('{' + ligatureObject.slice(0, -2) + '}');
             }
 
             //*****Reverse input direction for specific languages.*****
@@ -259,12 +283,27 @@ $.fn.keyboard = function(options) {
         $.each(keyListSplit, function(i, value) {
             if (value !== undefined) {
                 //keyObject = { default: (value[3] == '//' || value[3] == '-1' || value[3] === undefined) ? '-1' : value[3], shift: (value[4] == '//' || value[4] == '-1' || value[4] === undefined) ? '-1' : value[4], altgrp: (value[6] == '//' || value[6] == '-1' || value[6] === undefined) ? '-1' : value[6], shift_altgrp: (value[7] == '//' || value[7] == '-1' || value[7] === undefined) ? '-1' : value[7] };
-                keyObject = { default: value[shiftStateObject.default - 1] === undefined ? '-1' : value[shiftStateObject.default - 1], shift: value[shiftStateObject.shift - 1] === undefined ? '-1' : value[shiftStateObject.shift - 1], altgrp: value[shiftStateObject.altgrp - 1] === undefined ? '-1' : value[shiftStateObject.altgrp - 1], shift_altgrp: value[shiftStateObject.shift_altgrp - 1] === undefined ? '-1' : value[shiftStateObject.shift_altgrp - 1]};
+                keyObject = { default: determineKey(value[shiftStateObject.default-1], value[1]), shift: determineKey(value[shiftStateObject.shift - 1], value[1]), altgrp: determineKey(value[shiftStateObject.altgrp - 1], value[1]), shift_altgrp: determineKey(value[shiftStateObject.shift_altgrp - 1], value[1]) };
             } else {
                 keyObject = { default: '-1', shift: '-1', altgrp: '-1', shift_altgrp: '-1' };
             }
             appendKey(keyObject);
         });
+    }
+
+    //***********************************************************************************
+    //*                 Sort out deadkeys, ligature, and undefined.                     *
+    //***********************************************************************************
+    function determineKey(keyValue, VK) {
+        var returnKey = keyValue;
+
+        if (keyValue == '%%') {
+            returnKey = ligatureObject[VK];
+        } else if (keyValue === undefined) {
+            returnKey = '-1';
+        }
+
+        return returnKey;
     }
 
     //***********************************************************************************
