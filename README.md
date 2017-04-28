@@ -43,9 +43,14 @@ To initiate an instance of the keyboard within your application you may include 
 |--------|---------------|-------------|
 | inputType | 'text, textarea, number, password, search, tel, url, contenteditable' | May pass individual input types or comma-separated values. This is valid for both global and local instances. |
 | language | 'english' | Given as a string with comma-separated values i.e. 'english, spanish, chinese'. |
-| keyColor | '#E0E0E0' | Defines background color of keys. May pass hex string or specific color i.e. 'blue'. |
-| textColor | '#555555' | Defines text color used on keys. May pass hex string or specific color i.e. 'blue'. |
 | keyboardPosition | 'bottom' | Locate the keyboard at page 'top', 'middle', or 'bottom' with a default edge padding of 20px. |
+| cancelColor | '#E74C3C' | Defines background color of cancel button. May pass hex string or specific color i.e. 'blue'. |
+| cancelTextColor | '#FFFFFF' | Defines text color of cancel button. May pass hex string or specific color i.e. 'white'. |
+| acceptColor | '#2ECC71' | Defines background color of accept button. May pass hex string or specific color i.e. 'blue'. |
+| acceptTextColor | '#FFFFFF' | Defines text color of accept button. May pass hex string or specific color i.e. 'white'. |
+| keyColor | '#E0E0E0' | Defines background color of keys. May pass hex string or specific color i.e. 'blue'. |
+| keyTextColor | '#555555' | Defines text color used on keys. May pass hex string or specific color i.e. 'blue'. |
+
 
 ### Callbacks
 

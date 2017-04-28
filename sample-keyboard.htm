@@ -7,7 +7,6 @@
     <link rel="stylesheet" type="text/css" href="keyboard.css">
     <script type="text/javascript">
     $(document).ready(function() {
-
         $(document).keyboard({
             language: 'english, punjabi, vietnamese, arabic',
             enterKey: function() {
@@ -17,9 +16,9 @@
             keyColor: '',
             textColor: '',
             keyboardPosition: 'bottom',
-            inputType: ''
+            inputType: '',
+            acceptColor: ''
         });
-
     });
     </script>
     <title>MOK Project - Sample</title>
@@ -32,16 +31,13 @@
     <label>Password:</label>
     <input type="password" name="">
     <br><br>
-    <table>
-        <tr>
-            <td>Test 1</td>
-            <td contenteditable="true">Test 2</td>
-        </tr>
-        <tr>
-            <td contenteditable="true">Test 1</td>
-            <td contenteditable="contenteditable">Test 2</td>
-        </tr>
-    </table>
+    <p contenteditable="true">This is a content editable paragraph!</p>
+    <br><br>
+    <label>Phone:</label>
+    <input type="tel" name="">
+    <br><br>
+    <label>Number:</label>
+    <input type="number" name="">
 </body>
 
 </html>

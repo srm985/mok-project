@@ -32,7 +32,7 @@ $.fn.keyboard = function(options) {
     options = {
         language: typeof(options.language) === 'undefined' ? 'english' : options.language,
         keyColor: typeof(options.keyColor) === 'undefined' ? '#E0E0E0' : options.keyColor,
-        textColor: typeof(options.textColor) === 'undefined' ? '#555555' : options.textColor,
+        keyTextColor: typeof(options.keyTextColor) === 'undefined' ? '#555555' : options.keyTextColor,
         capsLightColor: typeof(options.capsLightColor) === 'undefined' ? '#3498DB' : options.capsLightColor,
         enterKey: typeof(options.enterKey) === 'undefined' ? '' : options.enterKey,
         tabKey: typeof(options.tabKey) === 'undefined' ? '' : options.tabKey,
@@ -41,7 +41,11 @@ $.fn.keyboard = function(options) {
         spareKey: typeof(options.spareKey) === 'undefined' ? '' : options.spareKey,
         languageKey: typeof(options.languageKey) === 'undefined' ? '' : options.languageKey,
         keyboardPosition: typeof(options.keyboardPosition) === 'undefined' ? 'bottom' : options.keyboardPosition,
-        inputType: setInputType(options.inputType)
+        inputType: setInputType(options.inputType),
+        cancelColor: typeof(options.cancelColor) === 'undefined' ? '#E74C3C' : options.cancelColor,
+        cancelTextColor: typeof(options.cancelTextColor) === 'undefined' ? '#FFFFFF' : options.cancelTextColor,
+        acceptColor: typeof(options.acceptColor) === 'undefined' ? '#2ECC71' : options.acceptColor,
+        acceptTextColor: typeof(options.acceptTextColor) === 'undefined' ? '#FFFFFF' : options.acceptTextColor
     };
 
     //*****Quick cleanup of our language array.*****
@@ -61,14 +65,14 @@ $.fn.keyboard = function(options) {
             inputTypeArray = inputType.trim().split(',');
             $.each(inputTypeArray, function(i, value) {
                 if (value.trim().toString() == 'contenteditable') {
-                    formattedString += 'td[contenteditable="true"], ';
+                    formattedString += '[contenteditable="true"], ';
                 } else {
                     formattedString += 'input[type="' + value.trim().toString() + '"], ';
                 }
             });
             formattedString = formattedString.slice(0, -2);
         } else {
-            formattedString = 'input[type="text"], input[type="textarea"], input[type="number"], input[type="password"], input[type="search"], input[type="tel"], input[type="url"], td[contenteditable="true"]';
+            formattedString = 'input[type="text"], input[type="textarea"], input[type="number"], input[type="password"], input[type="search"], input[type="tel"], input[type="url"], [contenteditable="true"]';
         }
         return (formattedString);
     }
@@ -86,21 +90,18 @@ $.fn.keyboard = function(options) {
         pageElement.on('focus click touch', options.inputType, function() {
             if ($(this).prop('class') != 'keyboard-input-field') {
                 focusedInputField = $(this);
-                if (focusedInputField.is('td')) {
-                    $('.keyboard-input-field').val(focusedInputField.html());
-                    $('.keyboard-input-field').prop('type', 'text');
-                } else {
+                if (focusedInputField.is('input')) {
                     $('.keyboard-input-field').val(focusedInputField.val());
                     $('.keyboard-input-field').prop('type', focusedInputField.prop('type'));
+                } else {
+
+                    $('.keyboard-input-field').val(focusedInputField.html());
+                    $('.keyboard-input-field').prop('type', 'text');
                 }
                 $('.keyboard-blackout-background').show();
                 $('.keyboard-wrapper').show();
                 keyboardOpen = true;
-                try {
-                    $('.keyboard-input-field').focus();
-                } catch (err) {
-                    console.log($(this).prop('class'));
-                }
+                $('.keyboard-input-field').focus();
             }
         });
 
@@ -120,7 +121,7 @@ $.fn.keyboard = function(options) {
         });
 
         //*****Provide a little functionality during external keyboard testing.*****
-        $(document).keypress(function(e) {
+        $(document).keyup(function(e) {
             if (e.which == 13 && $('.keyboard-wrapper').is(':visible')) {
                 acceptData();
                 e.preventDefault();
@@ -334,7 +335,12 @@ $.fn.keyboard = function(options) {
     //*     Read and subsequently write our depressed key to the appropriate form.      *
     //***********************************************************************************
     function handleKeypress(keyPressed) {
+        //*****Convert deadkey to hex and pad with zeros to ensure it's four digits.*****
+        var deadkeyLookup = ('0000' + keyPressed.charCodeAt(0).toString(16)).slice(-4),
+            caretPosition = $('.keyboard-input-field')[0].selectionStart;
+
         keyPressed = keyPressed.replace('&lt;', '<').replace('&gt;', '>').replace(/\bspace/, ' '); //Acount for &lt; and &gt; escaping.
+
         if (keyPressed.length > 1) {
             deadkeyPressed = '';
             switch (keyPressed) {
@@ -375,7 +381,11 @@ $.fn.keyboard = function(options) {
                     }
                     break;
                 case 'backspace':
-                    focusedInputField.val(focusedInputField.val().slice(0, -1));
+                    $('.keyboard-input-field').val($('.keyboard-input-field').val().slice(0, caretPosition - 1) + $('.keyboard-input-field').val().slice(caretPosition));
+                    caretPosition -= 1;
+                    $('.keyboard-input-field').focus();
+                    $('.keyboard-input-field')[0].selectionStart = caretPosition;
+                    $('.keyboard-input-field')[0].selectionEnd = caretPosition;
                     break;
                 case 'space':
                     //Handled by replacement function above.
@@ -424,9 +434,6 @@ $.fn.keyboard = function(options) {
                     break;
             }
         } else {
-            //*****Convert deadkey to hex and pad with zeros to ensure it's four digits.*****
-            var deadkeyLookup = ('0000' + keyPressed.charCodeAt(0).toString(16)).slice(-4);
-
             keyStatusObject.shift = false;
             keyStatusObject.altgrp = false;
             setKeys('default');
@@ -442,11 +449,14 @@ $.fn.keyboard = function(options) {
                 deadkeySet = deadkeyPressed;
             }
 
-            //focusedInputField.attr('dir', textFlowDirection);
-            //focusedInputField.val(focusedInputField.val() + keyPressed);
-
+            //*****Write key value and update input attributes.*****
             $('.keyboard-input-field').attr('dir', textFlowDirection);
-            $('.keyboard-input-field').val($('.keyboard-input-field').val() + keyPressed);
+            $('.keyboard-input-field').val($('.keyboard-input-field').val().slice(0, caretPosition) + keyPressed + $('.keyboard-input-field').val().slice(caretPosition));
+            //*****Return focus and update caret position.*****
+            caretPosition += keyPressed.length;
+            $('.keyboard-input-field').focus();
+            $('.keyboard-input-field')[0].selectionStart = caretPosition;
+            $('.keyboard-input-field')[0].selectionEnd = caretPosition;
         }
     }
 
@@ -457,20 +467,22 @@ $.fn.keyboard = function(options) {
         $('.keyboard-input-field').val('');
         $('.keyboard-wrapper').hide();
         $('.keyboard-blackout-background').hide();
+        keyboardOpen = false;
     }
 
     //***********************************************************************************
     //*                   Submit keyboard data to form and close.                       *
     //***********************************************************************************
     function acceptData() {
-        if (focusedInputField.is('td')) {
-            focusedInputField.html($('.keyboard-input-field').val());
-        } else {
+        if (focusedInputField.is('input')) {
             focusedInputField.val($('.keyboard-input-field').val());
+        } else {
+            focusedInputField.html($('.keyboard-input-field').val());
         }
         $('.keyboard-input-field').val('');
         $('.keyboard-wrapper').hide();
         $('.keyboard-blackout-background').hide();
+        keyboardOpen = false;
     }
 
     //***********************************************************************************
@@ -482,7 +494,11 @@ $.fn.keyboard = function(options) {
             keyboardHeight = $('.keyboard-wrapper').height(),
             keyboardWidth = $('.keyboard-wrapper').width();
         $('.keyboard-key').css('background-color', options.keyColor);
-        $('.keyboard-key').css('color', options.textColor);
+        $('.keyboard-key').css('color', options.keyTextColor);
+        $('.keyboard-cancel-button').css('background-color', options.cancelColor);
+        $('.keyboard-cancel-button').css('color', options.cancelTextColor);
+        $('.keyboard-accept-button').css('background-color', options.acceptColor);
+        $('.keyboard-accept-button').css('color', options.acceptTextColor);
         switch (options.keyboardPosition) {
             case 'top':
                 $('.keyboard-wrapper').css('top', '20px');
@@ -501,7 +517,6 @@ $.fn.keyboard = function(options) {
     //***********************************************************************************
     function destroyKeyboard() {
         $('.keyboard-wrapper').remove();
-        keyboardOpen = false;
     }
 
     //***********************************************************************************
@@ -509,7 +524,6 @@ $.fn.keyboard = function(options) {
     //***********************************************************************************
     function destroyKeys() {
         $('.keyboard-row').remove();
-        keyboardOpen = false;
     }
 
     //***********************************************************************************
