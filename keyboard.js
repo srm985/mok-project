@@ -24,6 +24,7 @@ $.fn.keyboard = function(options) {
         languageArrayPosition,
         shiftStateObject,
         deadkeyObject,
+        ligatureObject,
         deadkeyPressed = '',
         deadkeySet = false,
         textFlowDirection = 'LTR',
@@ -46,7 +47,8 @@ $.fn.keyboard = function(options) {
         cancelColor: typeof(options.cancelColor) === 'undefined' ? '#E74C3C' : options.cancelColor,
         cancelTextColor: typeof(options.cancelTextColor) === 'undefined' ? '#FFFFFF' : options.cancelTextColor,
         acceptColor: typeof(options.acceptColor) === 'undefined' ? '#2ECC71' : options.acceptColor,
-        acceptTextColor: typeof(options.acceptTextColor) === 'undefined' ? '#FFFFFF' : options.acceptTextColor
+        acceptTextColor: typeof(options.acceptTextColor) === 'undefined' ? '#FFFFFF' : options.acceptTextColor,
+        blackoutColor: typeof(options.blackoutColor) === 'undefined' ? '25, 25, 25, 0.9' : options.blackoutColor,
     };
 
     //*****Quick cleanup of our language array.*****
@@ -136,37 +138,22 @@ $.fn.keyboard = function(options) {
     function readKeyboardFile(file) {
         var keyData,
             shiftStateData,
-            shiftStateLocation,
+            shiftStateLocation = '',
             deadkeyData,
             deadkeyLocation = '',
+            ligatureData,
+            ligatureLocation = '',
             tempArr = new Array(),
             tempObject;
 
         shiftStateObject = '';
         deadkeyObject = '';
+        ligatureObject = '';
 
         $.get('/languages/' + file + '.klc', function(data) {
 
             //*****Extract our keyboard key data.*****
             keyData = data.match(/\w+\u0009\w+\u0009[\u0009]?\w+\u0009([-]?\w+|%%)[@]?\u0009([-]?\w+|%%)[@]?\u0009([-]?\w+|%%)[@]?(\u0009([-]?\w+|%%)[@]?)?(\u0009([-]?\w+|%%)[@]?)?(\u0009([-]?\w+|%%)[@]?)?\u0009\u0009\/\//g);
-
-            //*****Extract our deadkey data and convert to lookup table.*****
-            deadkeyLocation = data.indexOf('DEADKEY');
-            if (deadkeyLocation > 0) {
-                deadkeyData = data.slice(deadkeyLocation, data.indexOf('KEYNAME')).trim().split('DEADKEY');
-                deadkeyData.splice(0, 1);
-                $.each(deadkeyData, function(i, value) {
-                    tempArr = value.split(/\n/g);
-                    tempArr.splice(0, 2);
-                    tempObject = '';
-                    $.each(tempArr, function(_i, _value) {
-                        tempObject += '"' + _value.trim().slice(0, 4) + '": "' + _value.trim().slice(5, 9) + '", ';
-                    });
-                    tempObject = '{' + tempObject.slice(0, -2) + '}';
-                    deadkeyObject += '"' + value.trim().slice(0, 4) + '": ' + tempObject + ', ';
-                });
-                deadkeyObject = JSON.parse('{' + deadkeyObject.slice(0, -2) + '}');
-            }
 
             //*****Extract our shift state data and convert to lookup table.*****
             shiftStateLocation = data.indexOf('SHIFTSTATE');
@@ -190,6 +177,44 @@ $.fn.keyboard = function(options) {
                     shiftStateObject += value.match(/\w{6} [0-9]/).toString().slice(-1) + ', ';
                 });
                 shiftStateObject = JSON.parse('{' + shiftStateObject.toString().slice(0, -2) + '}');
+            }
+
+            //*****Extract our deadkey data and convert to lookup table.*****
+            deadkeyLocation = data.indexOf('DEADKEY');
+            if (deadkeyLocation > 0) {
+                deadkeyData = data.slice(deadkeyLocation, data.indexOf('KEYNAME')).trim().split('DEADKEY');
+                deadkeyData.splice(0, 1);
+                $.each(deadkeyData, function(i, value) {
+                    tempArr = value.split(/\n/g);
+                    tempArr.splice(0, 2);
+                    tempObject = '';
+                    $.each(tempArr, function(_i, _value) {
+                        tempObject += '"' + _value.trim().slice(0, 4) + '": "' + _value.trim().slice(5, 9) + '", ';
+                    });
+                    tempObject = '{' + tempObject.slice(0, -2) + '}';
+                    deadkeyObject += '"' + value.trim().slice(0, 4) + '": ' + tempObject + ', ';
+                });
+                deadkeyObject = JSON.parse('{' + deadkeyObject.slice(0, -2) + '}');
+            }
+
+            //*****Extract our ligature-generated keys and convert to lookup table.*****
+            ligatureLocation = data.indexOf('LIGATURE');
+            if (ligatureLocation > 0) {
+                ligatureData = data.slice(ligatureLocation, data.indexOf('KEYNAME')).trim().split(/\n/g);
+                ligatureData.splice(0, 5);
+                $.each(ligatureData, function(i, value) {
+                    if (value.indexOf('//') > 0) {
+                        ligatureData[i] = value.trim().split('//')[0].trim().replace(/\t/g, ' ').replace('  ', ' ').replace('  ', ' ').split(' ');
+                        ligatureData[i].splice(1, 1);
+                        ligatureObject += '"' + ligatureData[i][0] + '": ';
+                        ligatureData[i].splice(0, 1);
+                        $.each(ligatureData[i], function(j, _value) {
+                            ligatureData[i][j] = '"' + _value + '"';
+                        });
+                        ligatureObject += '[' + ligatureData[i] + '], ';
+                    }
+                });
+                ligatureObject = JSON.parse('{' + ligatureObject.slice(0, -2) + '}');
             }
 
             //*****Reverse input direction for specific languages.*****
@@ -259,12 +284,27 @@ $.fn.keyboard = function(options) {
         $.each(keyListSplit, function(i, value) {
             if (value !== undefined) {
                 //keyObject = { default: (value[3] == '//' || value[3] == '-1' || value[3] === undefined) ? '-1' : value[3], shift: (value[4] == '//' || value[4] == '-1' || value[4] === undefined) ? '-1' : value[4], altgrp: (value[6] == '//' || value[6] == '-1' || value[6] === undefined) ? '-1' : value[6], shift_altgrp: (value[7] == '//' || value[7] == '-1' || value[7] === undefined) ? '-1' : value[7] };
-                keyObject = { default: value[shiftStateObject.default - 1] === undefined ? '-1' : value[shiftStateObject.default - 1], shift: value[shiftStateObject.shift - 1] === undefined ? '-1' : value[shiftStateObject.shift - 1], altgrp: value[shiftStateObject.altgrp - 1] === undefined ? '-1' : value[shiftStateObject.altgrp - 1], shift_altgrp: value[shiftStateObject.shift_altgrp - 1] === undefined ? '-1' : value[shiftStateObject.shift_altgrp - 1]};
+                keyObject = { default: determineKey(value[shiftStateObject.default-1], value[1]), shift: determineKey(value[shiftStateObject.shift - 1], value[1]), altgrp: determineKey(value[shiftStateObject.altgrp - 1], value[1]), shift_altgrp: determineKey(value[shiftStateObject.shift_altgrp - 1], value[1]) };
             } else {
                 keyObject = { default: '-1', shift: '-1', altgrp: '-1', shift_altgrp: '-1' };
             }
             appendKey(keyObject);
         });
+    }
+
+    //***********************************************************************************
+    //*                 Sort out deadkeys, ligature, and undefined.                     *
+    //***********************************************************************************
+    function determineKey(keyValue, VK) {
+        var returnKey = keyValue;
+
+        if (keyValue == '%%') {
+            returnKey = ligatureObject[VK];
+        } else if (keyValue === undefined) {
+            returnKey = '-1';
+        }
+
+        return returnKey;
     }
 
     //***********************************************************************************
@@ -319,7 +359,9 @@ $.fn.keyboard = function(options) {
     //*                Cycle key values based on depressed function keys.               *
     //***********************************************************************************
     function setKeys(keyType) {
-        var keyObject;
+        var currentKey,
+            keyObject,
+            tempString = '';
 
         //*****Set keyboard to default and capitalize letters.*****
         if (keyStatusObject.caps && !keyStatusObject.shift && !keyStatusObject.altgrp) {
@@ -339,20 +381,28 @@ $.fn.keyboard = function(options) {
         }
 
         $('.keyboard-key').each(function() {
+            tempString = '';
             try {
-                keyObject = $(this).data('keyDataObject');
+                currentKey = $(this)
+                keyObject = currentKey.data('keyDataObject');
                 if (keyObject[keyType].length == 4) {
-                    $(this).html('&#x' + keyObject[keyType] + ';');
-                    $(this).data('keyval', $(this).html());
+                    currentKey.html('&#x' + keyObject[keyType] + ';');
+                    currentKey.data('keyval', currentKey.html());
                 } else if (keyObject[keyType].length == 5 && keyObject[keyType].match('@')) {
-                    $(this).html('&#x' + keyObject[keyType].replace('@', '') + ';');
-                    $(this).data('keyval', $(this).html());
+                    currentKey.html('&#x' + keyObject[keyType].replace('@', '') + ';');
+                    currentKey.data('keyval', currentKey.html());
+                } else if (keyObject[keyType].constructor === Array) {
+                    $.each(keyObject[keyType], function(i, value) {
+                        tempString += '&#x' + value + ';';
+                    });
+                    currentKey.html(tempString);
+                    currentKey.data('keyval', currentKey.html());
                 } else if (keyObject[keyType] == '-1' || keyObject[keyType] == '%%' || keyObject[keyType].length == 0) {
-                    $(this).html('&nbsp;');
-                    $(this).data('keyval', '');
+                    currentKey.html('&nbsp;');
+                    currentKey.data('keyval', '');
                 } else {
-                    $(this).html(keyObject[keyType]);
-                    $(this).data('keyval', $(this).html());
+                    currentKey.html(keyObject[keyType]);
+                    currentKey.data('keyval', currentKey.html());
                 }
             } catch (err) {
                 //
@@ -374,7 +424,7 @@ $.fn.keyboard = function(options) {
 
         keyPressed = keyPressed.replace('&lt;', '<').replace('&gt;', '>').replace(/\bspace/, ' '); //Acount for &lt; and &gt; escaping.
 
-        if (keyPressed.length > 1) {
+        if (keyPressed.length > 2) {
             deadkeyPressed = '';
             switch (keyPressed) {
                 case 'shift':
@@ -532,6 +582,7 @@ $.fn.keyboard = function(options) {
         $('.keyboard-cancel-button').css('color', options.cancelTextColor);
         $('.keyboard-accept-button').css('background-color', options.acceptColor);
         $('.keyboard-accept-button').css('color', options.acceptTextColor);
+        $('.keyboard-blackout-background').css('background-color', 'rgba(' + options.blackoutColor + ')');
         switch (options.keyboardPosition) {
             case 'top':
                 $('.keyboard-wrapper').css('top', '20px');
