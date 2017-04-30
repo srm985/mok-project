@@ -71,13 +71,15 @@ $.fn.keyboard = function(options) {
             $.each(inputTypeArray, function(i, value) {
                 if (value.trim().toString() == 'contenteditable') {
                     formattedString += '[contenteditable="true"], ';
+                } else if (value.trim().toString() == 'textarea') {
+                    formattedString += 'textarea, ';
                 } else {
                     formattedString += 'input[type="' + value.trim().toString() + '"], ';
                 }
             });
             formattedString = formattedString.slice(0, -2);
         } else {
-            formattedString = 'input[type="text"], input[type="textarea"], input[type="number"], input[type="password"], input[type="search"], input[type="tel"], input[type="url"], [contenteditable="true"]';
+            formattedString = 'input[type="text"], input[type="number"], input[type="password"], input[type="search"], input[type="tel"], input[type="url"], textarea, [contenteditable="true"]';
         }
         return (formattedString);
     }
@@ -99,7 +101,6 @@ $.fn.keyboard = function(options) {
                     $('.keyboard-input-field').val(focusedInputField.val());
                     $('.keyboard-input-field').prop('type', focusedInputField.prop('type'));
                 } else {
-
                     $('.keyboard-input-field').val(focusedInputField.html());
                     $('.keyboard-input-field').prop('type', 'text');
                 }
@@ -112,7 +113,12 @@ $.fn.keyboard = function(options) {
 
         //*****Listen for keypresses.*****
         $(document).on('click touch', '.keyboard-key', function() {
-            handleKeypress($(this).data('keyval'));
+            var keyRegistered = $(this).data('keyval');
+            if ($('.keyboard-input-field').prop('type') != 'tel' && $('.keyboard-input-field').prop('type') != 'number') {
+                handleKeypress(keyRegistered);
+            } else if (($('.keyboard-input-field').prop('type') == 'tel' || $('.keyboard-input-field').prop('type') == 'number') && (keyRegistered.match(/\d/) || (keyRegistered.length > 2))) {
+                handleKeypress(keyRegistered);
+            }
         });
 
         //*****Handle our keyboard close button.*****
@@ -578,6 +584,7 @@ $.fn.keyboard = function(options) {
         $('.keyboard-input-field').val('');
         $('.keyboard-wrapper').hide();
         $('.keyboard-blackout-background').hide();
+        clearKeyboardState();
         keyboardOpen = false;
     }
 
@@ -593,6 +600,7 @@ $.fn.keyboard = function(options) {
         $('.keyboard-input-field').val('');
         $('.keyboard-wrapper').hide();
         $('.keyboard-blackout-background').hide();
+        clearKeyboardState();
         keyboardOpen = false;
     }
 
@@ -628,6 +636,7 @@ $.fn.keyboard = function(options) {
     //*                    Strip our keyboard element from page.                        *
     //***********************************************************************************
     function destroyKeyboard() {
+        clearKeyboardState();
         $('.keyboard-wrapper').remove();
     }
 
@@ -635,6 +644,7 @@ $.fn.keyboard = function(options) {
     //*                      Strip keys from keyboard element.                          *
     //***********************************************************************************
     function destroyKeys() {
+        clearKeyboardState();
         $('.keyboard-row').remove();
     }
 
