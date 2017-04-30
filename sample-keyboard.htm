@@ -5,10 +5,39 @@
     <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
     <script type="text/javascript" src="keyboard.js"></script>
     <link rel="stylesheet" type="text/css" href="keyboard.css">
+    <script type="text/javascript">
+    $(document).ready(function() {
+        $(document).keyboard({
+            language: 'us, arabic, vietnamese, hindi',
+            enterKey: function() {
+                alert('Hey there! This is a callback function example.');
+            },
+            keyboardPosition: 'bottom'
+        });
+    });
+    </script>
+    <title>MOK Project - Sample</title>
+    <link rel="icon" href="favicon.ico">
 </head>
 
 <body>
-	<button onclick="languageSwap();">Language</button>
+    <label>Login:</label>
+    <input type="text" name="">
+    <label>Password:</label>
+    <input type="password" name="">
+    <br>
+    <br>
+    <p contenteditable="true">This is a content editable paragraph!</p>
+    <br>
+    <br>
+    <label>Phone:</label>
+    <input type="tel" name="">
+    <br>
+    <br>
+    <label>Text Area:</label>
+    <br>
+    <textarea>Text areas will be parsed into the keyboard input field as inputs, type=text.</textarea>
+    <br>
 </body>
 
 </html>

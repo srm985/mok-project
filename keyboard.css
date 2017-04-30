@@ -1,25 +1,91 @@
-.keyboard-wrapper {
+.keyboard-blackout-background {
     position: fixed;
-    bottom: 10%;
-    left: 10%;
-    width: 80%;
+    z-index: 9998;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(25, 25, 25, 0.9);
+}
+
+.keyboard-wrapper {
+    font-family: 'Verdana', sans-serif;
+    font-size: 18px;
+    line-height: 18px;
+    position: fixed;
+    z-index: 9999;
+    width: calc(100% - 40px);
+    min-width: 1024px;
+    max-width: 1100px;
+    color: #555555;
+}
+
+.keyboard-wrapper .keyboard-action-wrapper {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+}
+
+.keyboard-wrapper .keyboard-action-button {
+    font-family: inherit;
+    font-size: inherit;
+    display: inline;
+    width: 15%;
+    height: 40px;
+    margin: 0 5px;
+    padding: 0;
+    cursor: pointer;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 4px;
+    outline: none;
+}
+
+.keyboard-wrapper .keyboard-cancel-button {
+    background-color: #E74C3C;
+}
+
+.keyboard-wrapper .keyboard-accept-button {
+    background-color: #2ECC71;
+}
+
+.keyboard-wrapper .keyboard-input-field {
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+    width: 60%;
+    height: 35px;
+    padding-right: 10px;
+    padding-left: 10px;
+    color: inherit;
+    border: solid 1px #555555;
+    border-radius: 4px;
+    outline: none;
 }
 
 .keyboard-row {
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
     width: 100%;
-    height: auto;
+    height: 50px;
     margin: 20px 0;
 }
 
 .keyboard-key {
-    font-size: 18px;
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
     display: inline;
-    height: 50px;
+    height: 100%;
     margin: 0 5px;
     padding: 0;
-    color: #555555;
+    cursor: pointer;
+    vertical-align: middle;
+    color: inherit;
     border: none;
     border-radius: 4px;
+    outline: none;
     background-color: #E0E0E0;
 }
 
@@ -45,5 +111,5 @@
 }
 
 .caps-lock-key-active:before {
-    background-color: blue;
+    background-color: #3498DB;
 }
