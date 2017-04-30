@@ -49,6 +49,8 @@ $.fn.keyboard = function(options) {
         acceptColor: typeof(options.acceptColor) === 'undefined' ? '#2ECC71' : options.acceptColor,
         acceptTextColor: typeof(options.acceptTextColor) === 'undefined' ? '#FFFFFF' : options.acceptTextColor,
         blackoutColor: typeof(options.blackoutColor) === 'undefined' ? '25, 25, 25, 0.9' : options.blackoutColor,
+        allowEscapeCancel: typeof(options.allowEscapeCancel) === 'undefined' ? true : options.allowEscapeCancel,
+        allowEnterAccept: typeof(options.allowEnterAccept) === 'undefined' ? true : options.allowEnterAccept,
     };
 
     //*****Quick cleanup of our language array.*****
@@ -132,15 +134,18 @@ $.fn.keyboard = function(options) {
 
     function hardwareKeypress(key) {
         if ($('.keyboard-wrapper').is(':visible')) {
-            console.log(key.which);
             switch (key.which) {
                 case 13:
-                    acceptData();
-                    key.preventDefault();
+                    if (options.allowEnterAccept) {
+                        acceptData();
+                        key.preventDefault();
+                    }
                     break;
                 case 27:
-                    discardData();
-                    key.preventDefault();
+                    if (options.allowEscapeCancel) {
+                        discardData();
+                        key.preventDefault();
+                    }
                     break;
             }
 

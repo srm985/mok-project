@@ -21,7 +21,7 @@ $ http-server
 
 _Feel free to disregard these instructions if you have your own preferred server package._
 
-##### Prerequisites / Dependencies
+#### Prerequisites / Dependencies
 
 This project was built and tested on jQuery 3.2 and is fed .klc files from [Microsoft Keyboard Layout Creator](https://www.microsoft.com/en-us/download/details.aspx?id=22339) V1.4.
 
@@ -37,7 +37,7 @@ To initiate an instance of the keyboard within your application you may include 
 </script>
 ```
 
-### Options
+#### Options
 
 | Option | Default Value | Information |
 |--------|---------------|-------------|
@@ -51,9 +51,11 @@ To initiate an instance of the keyboard within your application you may include 
 | keyColor | '#E0E0E0' | Defines background color of keys. May pass hex string or specific color i.e. 'blue'. |
 | keyTextColor | '#555555' | Defines text color used on keys. May pass hex string or specific color i.e. 'blue'. |
 | blackoutColor | '25, 25, 25, 0.9' | Defines color and opacity of blackout background. Passed as RGBA string. |
+| allowEscapeCancel | true | Cancel keyboard input with hardware keyboard [Escape] key. |
+| allowEnterAccept | true | Accept keyboard input with hardware keyboard [Enter] key. |
 
 
-### Callbacks
+#### Callbacks
 
 | Name | Information |
 |------|-------------|
@@ -64,13 +66,118 @@ To initiate an instance of the keyboard within your application you may include 
 | spareKey | Define action of [Spare] key |
 | languageKey | Define action of [Language] key |
 
-_You may change the user-displayed names of any keys without affecting functionality._
+_You may change the user-displayed names of any keys in keyboard.js without affecting functionality._
+
+## Supported Keyboards
+
+* Albanian
+* Arabic
+* Azeri-Cyrillic
+* Azeri-Latin
+* Bashkir
+* Belarusian
+* Belgian
+* Bengali
+* Bosnian
+* Bulgarian
+* Croatian
+* Czech-Programmer
+* Czech
+* Danish
+* Dutch
+* Estonian
+* Faeroese
+* Finnish-Sami
+* Finnish
+* French
+* Gaelic
+* Georgian
+* German
+* Greek
+* Greenlandic
+* Gujarati
+* Hausa
+* Hebrew
+* Hindi
+* Hungarian
+* Icelandic
+* Igbo
+* Irish
+* Italian
+* Japanese-Latin
+* Kannada
+* Kazakh
+* Khmer
+* Korean-Latin
+* Kyrgyz
+* Languages
+* Lao
+* Latvian
+* Lithuanian
+* Macedonian
+* Malayalam
+* Maltese
+* Maori
+* Marathi
+* Mongolian
+* Nepali
+* Norwegian
+* Oriya
+* Pashto
+* Persian
+* Polish
+* Portguese-Brazil
+* Portguese
+* Punjabi
+* Romanian
+* Russian
+* Serbian
+* Sesotho-Sa-Leboa
+* Setswana
+* Sinhala
+* Slovak
+* Slovenian
+* Sorbian
+* Spanish
+* Swedish
+* Swiss-French
+* Swiss-German
+* Syriac
+* Tajik
+* Tamil
+* Tatar
+* Telugu
+* Thai-Kedmanee
+* Thai-Pattachote
+* Tibetan
+* Turkish-F
+* Turkish-Q
+* Turkmen
+* Uk
+* Ukranian
+* Urdu
+* US-Dvorak
+* US
+* Uyghur
+* Uzbek
+* Vietnamese
+* Wolof
+* Yakut
+* Yoruba
+
 
 ## Bugs
 
-I'm not certain if ligature support is fully functioning for keyboards such as Hindi, Punjabi, Arabic, etc...
+I'm not certain if ligature support is fully functioning for keyboards such as Hindi, Punjabi, Arabic, etc... I need your help in verifying these layouts! I do not speak these languages and I've found keyboard layouts very inconsistent. If you find a keyboard that is not function, I'll be happy to make any revisions needed.
+
+I have not personally tested every keyboard and you may find bugs along your journey. I'll work to quickly resolve any issues you might uncover.
 
 This initial release is not intended to be mobile friendly. It's original scope was intended for those devices such as terminals. It is the intention to provide mobile support at a later time.
+
+## Coming Features
+
+* Mobile Options
+* Hardware-Keyboard Listeners
 
 ## Versioning
 

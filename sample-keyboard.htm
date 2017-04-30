@@ -8,17 +8,11 @@
     <script type="text/javascript">
     $(document).ready(function() {
         $(document).keyboard({
-            language: 'english, arabic, vietnamese, hindi',
+            language: 'us, arabic, vietnamese, hindi',
             enterKey: function() {
-                alert();
+                alert('Hey there! This is a callback function example.');
             },
-            settingsKey: 'test',
-            keyColor: '',
-            textColor: '',
             keyboardPosition: 'bottom',
-            inputType: '',
-            acceptColor: '',
-            blackoutColor: ''
         });
     });
     </script>
