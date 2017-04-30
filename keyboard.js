@@ -173,8 +173,9 @@ $.fn.keyboard = function(options) {
         $.get('/languages/' + file + '.klc', function(data) {
 
             //*****Extract our keyboard key data.*****
-            keyData = data.match(/[0-9][\w]?(\t|\s)\w+(\t|\s)[(\t|\s)]?\w+(\t|\s)([-]?\w+|%%)[@]?(\t|\s)([-]?\w+|%%)[@]?(\t|\s)([-]?\w+|%%)[@]?((\t|\s)([-]?\w+|%%)[@]?)?((\t|\s)([-]?\w+|%%)[@]?)?((\t|\s)([-]?\w+|%%)[@]?)?(\t|\s)(\t|\s)?\/\//g);
-            $('body').append(keyData);
+            //keyData = data.match(/[0-9][\w]?(\t|\s)\w+(\t|\s)[(\t|\s)]?\w+(\t|\s)([-]?\w+|%%)[@]?(\t|\s)([-]?\w+|%%)[@]?(\t|\s)([-]?\w+|%%)[@]?((\t|\s)([-]?\w+|%%)[@]?)?((\t|\s)([-]?\w+|%%)[@]?)?((\t|\s)([-]?\w+|%%)[@]?)?(\t|\s)(\t|\s)?\/\//g);
+            data = data.replace(/\u0000/g, '');
+            keyData = data.match(/\d(\w)?\s+\w+\s+\d\s+(-1|\w+@?|%%)\s+(-1|\w+@?|%%)\s+(-1|\w+@?|%%)(\s+(-1|\w+@?|%%))?(\s+(-1|\w+@?|%%))?(\s+(-1|\w+@?|%%))?\s+\/\//g);
 
             //*****Extract our shift state data and convert to lookup table.*****
             shiftStateLocation = data.indexOf('SHIFTSTATE');
@@ -195,7 +196,8 @@ $.fn.keyboard = function(options) {
                     } else if (value.indexOf('Shft') != -1) {
                         shiftStateObject += '"shift": ';
                     }
-                    shiftStateObject += value.match(/\w{6} [0-9]/).toString().slice(-1) + ', ';
+                    //shiftStateObject += value.match(/\w{6} [0-9]/).toString().slice(-1) + ', ';
+                    shiftStateObject += value.match(/\w{6}\s[0-9]/).toString().slice(-1) + ', ';
                 });
                 shiftStateObject = JSON.parse('{' + shiftStateObject.toString().slice(0, -2) + '}');
             }
@@ -258,7 +260,9 @@ $.fn.keyboard = function(options) {
             keyMapArray = new Array(47);
 
         $.each(keyList, function(i, value) {
-            keyObject[i] = value.toString().split(/\u0009+/g);
+            //keyObject[i] = value.toString().split(/\u0009+/g);
+            keyObject[i] = value.toString().replace(/(\t+|\s+)/g, ' ');
+            keyObject[i] = keyObject[i].split(' ');
             if (keyMap[keyObject[i][0]] !== undefined) {
                 keyMapArray[keyMap[keyObject[i][0]]] = keyObject[i];
             }
@@ -425,13 +429,15 @@ $.fn.keyboard = function(options) {
                     currentKey.html(keyObject[keyType]);
                     currentKey.data('keyval', currentKey.html());
                 }
+
+                if (!keyStatusObject.shift && keyStatusObject.caps && !keyStatusObject.altgrp) {
+                    currentKey.html(currentKey.html().length == 1 ? currentKey.html().toUpperCase() : currentKey.html());
+                    currentKey.data('keyval', currentKey.html().length == 1 ? currentKey.html() : currentKey.data('keyval'));
+                }
             } catch (err) {
                 //
             }
 
-            if (!keyStatusObject.shift && keyStatusObject.caps && !keyStatusObject.altgrp) {
-                $(this).html($(this).html().length == 1 ? $(this).html().toUpperCase() : $(this).html());
-            }
         });
     }
 
@@ -524,6 +530,7 @@ $.fn.keyboard = function(options) {
                     } else {
                         languageArrayPosition = 0;
                     }
+                    clearKeyboardState();
                     readKeyboardFile(options.language[languageArrayPosition]);
                     //User-definable callback.
                     if (options.languageKey && typeof(options.languageKey) === 'function') {
@@ -629,6 +636,17 @@ $.fn.keyboard = function(options) {
     //***********************************************************************************
     function destroyKeys() {
         $('.keyboard-row').remove();
+    }
+
+    //***********************************************************************************
+    //*                  Reset all of our keyboard function keys.                       *
+    //***********************************************************************************
+    function clearKeyboardState() {
+        for (var property in keyStatusObject) {
+            if (keyStatusObject.hasOwnProperty(property)) {
+                keyStatusObject[property] = false;
+            }
+        }
     }
 
     //***********************************************************************************
