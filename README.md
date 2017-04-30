@@ -45,7 +45,7 @@ To initiate an instance of the keyboard within your application you may include 
 | Option | Default Value | Information |
 |--------|---------------|-------------|
 | inputType | 'text, textarea, number, password, search, tel, url, contenteditable' | May pass individual input types or comma-separated values. This is valid for both global and local instances. |
-| language | 'english' | Given as a string with comma-separated values i.e. 'english, spanish, chinese'. |
+| language | '' | Given as a string with comma-separated values i.e. 'english, spanish, chinese'. |
 | keyboardPosition | 'bottom' | Locate the keyboard at page 'top', 'middle', or 'bottom' with a default edge padding of 20px. |
 | cancelColor | '#E74C3C' | Defines background color of cancel button. May pass hex string or specific color i.e. 'blue'. |
 | cancelTextColor | '#FFFFFF' | Defines text color of cancel button. May pass hex string or specific color i.e. 'white'. |
