@@ -177,7 +177,8 @@ This initial release is not intended to be mobile friendly. It's original scope 
 ## Coming Features
 
 * Mobile Options
-* Hardware-Keyboard Listeners
+* Hardware-Keyboard Listeners (Perhaps)
+* Number Pad Only Option
 
 ## Versioning
 
