@@ -124,17 +124,32 @@ $.fn.keyboard = function(options) {
         });
 
         //*****Provide a little functionality during external keyboard testing.*****
-        $(document).keyup(function(e) {
-            if (e.which == 13 && $('.keyboard-wrapper').is(':visible')) {
-                acceptData();
-                e.preventDefault();
-            } else if (e.which == 27 && $('.keyboard-wrapper').is(':visible')) {
-                discardData();
-                e.preventDefault();
-            }
+        $(document).on('keydown', function(e) {
+            keyCodeStored = e.which;
+            hardwareKeypress(e);
         });
     }
 
+    function hardwareKeypress(key) {
+        if ($('.keyboard-wrapper').is(':visible')) {
+            console.log(key.which);
+            switch (key.which) {
+                case 13:
+                    acceptData();
+                    key.preventDefault();
+                    break;
+                case 27:
+                    discardData();
+                    key.preventDefault();
+                    break;
+            }
+
+        }
+    }
+
+    //***********************************************************************************
+    //*         Read our keyboard file and parse information into usable tables         *
+    //***********************************************************************************
     function readKeyboardFile(file) {
         var keyData,
             shiftStateData,
