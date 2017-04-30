@@ -32,7 +32,10 @@ To initiate an instance of the keyboard within your application you may include 
 ```sh
 <script type="text/javascript">
     $(document).ready(function() {
-        $(document).keyboard();
+        $(document).keyboard({
+            language: 'us',
+            keyboardPosition: 'bottom'
+        });
     });
 </script>
 ```
@@ -166,13 +169,15 @@ _You may change the user-displayed names of any keys in keyboard.js without affe
 * Yoruba
 
 
-## Bugs
+## Bugs / Drawbacks
 
 I'm not certain if ligature support is fully functioning for keyboards such as Hindi, Punjabi, Arabic, etc... I need your help in verifying these layouts! I do not speak these languages and I've found keyboard layouts very inconsistent. If you find a keyboard that is not function, I'll be happy to make any revisions needed.
 
 I have not personally tested every keyboard and you may find bugs along your journey. I'll work to quickly resolve any issues you might uncover.
 
 This initial release is not intended to be mobile friendly. It's original scope was intended for those devices such as terminals. It is the intention to provide mobile support at a later time.
+
+Due to the nature of JavaScript / jQuery, I currently do not know of a way to load all keyboard layouts in a directory. You must declare all keyboards which you wish to use.
 
 ## Coming Features
 
