@@ -30,6 +30,9 @@ This project was built and tested on jQuery 3.2 and is fed .klc files from [Micr
 To initiate an instance of the keyboard within your application you may include the following script:
 
 ```sh
+<script type="text/javascript" src="keyboard.min.js"></script>
+<link rel="stylesheet" type="text/css" href="keyboard.min.css">
+
 <script type="text/javascript">
     $(document).ready(function() {
         $(document).keyboard({
