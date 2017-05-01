@@ -175,7 +175,7 @@ $.fn.keyboard = function(options) {
         deadkeyObject = '';
         ligatureObject = '';
 
-        $.get('/languages/' + file + '.klc', function(data) {
+        $.get('languages/' + file + '.klc', function(data) {
 
             //*****Extract our keyboard key data.*****
             //keyData = data.match(/[0-9][\w]?(\t|\s)\w+(\t|\s)[(\t|\s)]?\w+(\t|\s)([-]?\w+|%%)[@]?(\t|\s)([-]?\w+|%%)[@]?(\t|\s)([-]?\w+|%%)[@]?((\t|\s)([-]?\w+|%%)[@]?)?((\t|\s)([-]?\w+|%%)[@]?)?((\t|\s)([-]?\w+|%%)[@]?)?(\t|\s)(\t|\s)?\/\//g);
