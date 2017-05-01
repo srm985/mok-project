@@ -154,7 +154,6 @@ $.fn.keyboard = function(options) {
                     }
                     break;
             }
-
         }
     }
 
