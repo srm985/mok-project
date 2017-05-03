@@ -22,13 +22,15 @@ $.fn.keyboard = function(options) {
         languageList,
         resizeTimerActive = false,
         languageArrayPosition,
+        storedKeyboardObject = { keyboardFile: '', arrayPosition: '' },
         shiftStateObject,
         deadkeyObject,
         ligatureObject,
         deadkeyPressed = '',
         deadkeySet = false,
         textFlowDirection = 'LTR',
-        keyboardOpen = false;
+        keyboardOpen = false,
+        keyboardWrapperPresent = false;
 
     //*****Find all of our default options defined here.*****
     options = {
@@ -87,7 +89,6 @@ $.fn.keyboard = function(options) {
     init();
 
     function init() {
-        var inputFieldLabel = '';
 
         languageArrayPosition = 0;
 
@@ -161,6 +162,23 @@ $.fn.keyboard = function(options) {
     //*         Read our keyboard file and parse information into usable tables         *
     //***********************************************************************************
     function readKeyboardFile(file) {
+        var fileData = 'p';
+
+        if (storedKeyboardObject.keyboardFile != '' && storedKeyboardObject.arrayPosition == languageArrayPosition) {
+            parseKeyboardFile(file, storedKeyboardObject.keyboardFile);
+        } else {
+            $.get('languages/' + file + '.klc', function(data) {
+                storedKeyboardObject.keyboardFile = data;
+                storedKeyboardObject.arrayPosition = languageArrayPosition;
+                fileData = 'data';
+                parseKeyboardFile(file, data);
+            });
+
+        }
+    }
+
+    function parseKeyboardFile(file, data) {
+
         var keyData,
             shiftStateData,
             shiftStateLocation = '',
@@ -175,85 +193,83 @@ $.fn.keyboard = function(options) {
         deadkeyObject = '';
         ligatureObject = '';
 
-        $.get('languages/' + file + '.klc', function(data) {
+        //*****Extract our keyboard key data.*****
+        //keyData = data.match(/[0-9][\w]?(\t|\s)\w+(\t|\s)[(\t|\s)]?\w+(\t|\s)([-]?\w+|%%)[@]?(\t|\s)([-]?\w+|%%)[@]?(\t|\s)([-]?\w+|%%)[@]?((\t|\s)([-]?\w+|%%)[@]?)?((\t|\s)([-]?\w+|%%)[@]?)?((\t|\s)([-]?\w+|%%)[@]?)?(\t|\s)(\t|\s)?\/\//g);
+        data = data.replace(/\u0000/g, '');
+        keyData = data.match(/\d(\w)?\s+\w+\s+\d\s+(-1|\w+@?|%%)\s+(-1|\w+@?|%%)\s+(-1|\w+@?|%%)(\s+(-1|\w+@?|%%))?(\s+(-1|\w+@?|%%))?(\s+(-1|\w+@?|%%))?\s+\/\//g);
 
-            //*****Extract our keyboard key data.*****
-            //keyData = data.match(/[0-9][\w]?(\t|\s)\w+(\t|\s)[(\t|\s)]?\w+(\t|\s)([-]?\w+|%%)[@]?(\t|\s)([-]?\w+|%%)[@]?(\t|\s)([-]?\w+|%%)[@]?((\t|\s)([-]?\w+|%%)[@]?)?((\t|\s)([-]?\w+|%%)[@]?)?((\t|\s)([-]?\w+|%%)[@]?)?(\t|\s)(\t|\s)?\/\//g);
-            data = data.replace(/\u0000/g, '');
-            keyData = data.match(/\d(\w)?\s+\w+\s+\d\s+(-1|\w+@?|%%)\s+(-1|\w+@?|%%)\s+(-1|\w+@?|%%)(\s+(-1|\w+@?|%%))?(\s+(-1|\w+@?|%%))?(\s+(-1|\w+@?|%%))?\s+\/\//g);
+        //*****Extract our shift state data and convert to lookup table.*****
+        shiftStateLocation = data.indexOf('SHIFTSTATE');
+        if (shiftStateLocation > 0) {
+            shiftStateData = data.slice(shiftStateLocation, data.indexOf('LAYOUT')).trim().split(/\n/g);
+            shiftStateData.splice(0, 2);
+            $.each(shiftStateData, function(i, value) {
+                if (value.indexOf(':') == -1) {
+                    shiftStateObject += '"default": ';
+                } else if (value.indexOf('Shft  Ctrl Alt') != -1) {
+                    shiftStateObject += '"shift_altgrp": ';
+                } else if (value.indexOf('Shft  Ctrl') != -1) {
+                    shiftStateObject += '"ctrl_shift": ';
+                } else if (value.indexOf('Ctrl Alt') != -1) {
+                    shiftStateObject += '"altgrp": ';
+                } else if (value.indexOf('Ctrl') != -1) {
+                    shiftStateObject += '"ctrl": ';
+                } else if (value.indexOf('Shft') != -1) {
+                    shiftStateObject += '"shift": ';
+                }
+                //shiftStateObject += value.match(/\w{6} [0-9]/).toString().slice(-1) + ', ';
+                shiftStateObject += value.match(/\w{6}\s[0-9]/).toString().slice(-1) + ', ';
+            });
+            shiftStateObject = JSON.parse('{' + shiftStateObject.toString().slice(0, -2) + '}');
+        }
 
-            //*****Extract our shift state data and convert to lookup table.*****
-            shiftStateLocation = data.indexOf('SHIFTSTATE');
-            if (shiftStateLocation > 0) {
-                shiftStateData = data.slice(shiftStateLocation, data.indexOf('LAYOUT')).trim().split(/\n/g);
-                shiftStateData.splice(0, 2);
-                $.each(shiftStateData, function(i, value) {
-                    if (value.indexOf(':') == -1) {
-                        shiftStateObject += '"default": ';
-                    } else if (value.indexOf('Shft  Ctrl Alt') != -1) {
-                        shiftStateObject += '"shift_altgrp": ';
-                    } else if (value.indexOf('Shft  Ctrl') != -1) {
-                        shiftStateObject += '"ctrl_shift": ';
-                    } else if (value.indexOf('Ctrl Alt') != -1) {
-                        shiftStateObject += '"altgrp": ';
-                    } else if (value.indexOf('Ctrl') != -1) {
-                        shiftStateObject += '"ctrl": ';
-                    } else if (value.indexOf('Shft') != -1) {
-                        shiftStateObject += '"shift": ';
-                    }
-                    //shiftStateObject += value.match(/\w{6} [0-9]/).toString().slice(-1) + ', ';
-                    shiftStateObject += value.match(/\w{6}\s[0-9]/).toString().slice(-1) + ', ';
+        //*****Extract our deadkey data and convert to lookup table.*****
+        deadkeyLocation = data.indexOf('DEADKEY');
+        if (deadkeyLocation > 0) {
+            deadkeyData = data.slice(deadkeyLocation, data.indexOf('KEYNAME')).trim().split('DEADKEY');
+            deadkeyData.splice(0, 1);
+            $.each(deadkeyData, function(i, value) {
+                tempArr = value.split(/\n/g);
+                tempArr.splice(0, 2);
+                tempObject = '';
+                $.each(tempArr, function(_i, _value) {
+                    tempObject += '"' + _value.trim().slice(0, 4) + '": "' + _value.trim().slice(5, 9) + '", ';
                 });
-                shiftStateObject = JSON.parse('{' + shiftStateObject.toString().slice(0, -2) + '}');
-            }
+                tempObject = '{' + tempObject.slice(0, -2) + '}';
+                deadkeyObject += '"' + value.trim().slice(0, 4) + '": ' + tempObject + ', ';
+            });
+            deadkeyObject = JSON.parse('{' + deadkeyObject.slice(0, -2) + '}');
+        }
 
-            //*****Extract our deadkey data and convert to lookup table.*****
-            deadkeyLocation = data.indexOf('DEADKEY');
-            if (deadkeyLocation > 0) {
-                deadkeyData = data.slice(deadkeyLocation, data.indexOf('KEYNAME')).trim().split('DEADKEY');
-                deadkeyData.splice(0, 1);
-                $.each(deadkeyData, function(i, value) {
-                    tempArr = value.split(/\n/g);
-                    tempArr.splice(0, 2);
-                    tempObject = '';
-                    $.each(tempArr, function(_i, _value) {
-                        tempObject += '"' + _value.trim().slice(0, 4) + '": "' + _value.trim().slice(5, 9) + '", ';
+        //*****Extract our ligature-generated keys and convert to lookup table.*****
+        ligatureLocation = data.indexOf('LIGATURE');
+        if (ligatureLocation > 0) {
+            ligatureData = data.slice(ligatureLocation, data.indexOf('KEYNAME')).trim().split(/\n/g);
+            ligatureData.splice(0, 5);
+            $.each(ligatureData, function(i, value) {
+                if (value.indexOf('//') > 0) {
+                    ligatureData[i] = value.trim().split('//')[0].trim().replace(/\t/g, ' ').replace('  ', ' ').replace('  ', ' ').split(' ');
+                    ligatureData[i].splice(1, 1);
+                    ligatureObject += '"' + ligatureData[i][0] + '": ';
+                    ligatureData[i].splice(0, 1);
+                    $.each(ligatureData[i], function(j, _value) {
+                        ligatureData[i][j] = '"' + _value + '"';
                     });
-                    tempObject = '{' + tempObject.slice(0, -2) + '}';
-                    deadkeyObject += '"' + value.trim().slice(0, 4) + '": ' + tempObject + ', ';
-                });
-                deadkeyObject = JSON.parse('{' + deadkeyObject.slice(0, -2) + '}');
-            }
+                    ligatureObject += '[' + ligatureData[i] + '], ';
+                }
+            });
+            ligatureObject = JSON.parse('{' + ligatureObject.slice(0, -2) + '}');
+        }
 
-            //*****Extract our ligature-generated keys and convert to lookup table.*****
-            ligatureLocation = data.indexOf('LIGATURE');
-            if (ligatureLocation > 0) {
-                ligatureData = data.slice(ligatureLocation, data.indexOf('KEYNAME')).trim().split(/\n/g);
-                ligatureData.splice(0, 5);
-                $.each(ligatureData, function(i, value) {
-                    if (value.indexOf('//') > 0) {
-                        ligatureData[i] = value.trim().split('//')[0].trim().replace(/\t/g, ' ').replace('  ', ' ').replace('  ', ' ').split(' ');
-                        ligatureData[i].splice(1, 1);
-                        ligatureObject += '"' + ligatureData[i][0] + '": ';
-                        ligatureData[i].splice(0, 1);
-                        $.each(ligatureData[i], function(j, _value) {
-                            ligatureData[i][j] = '"' + _value + '"';
-                        });
-                        ligatureObject += '[' + ligatureData[i] + '], ';
-                    }
-                });
-                ligatureObject = JSON.parse('{' + ligatureObject.slice(0, -2) + '}');
-            }
+        //*****Reverse input direction for specific languages.*****
+        if (file == 'arabic') {
+            textFlowDirection = 'RTL';
+        } else {
+            textFlowDirection = 'LTR';
+        }
 
-            //*****Reverse input direction for specific languages.*****
-            if (file == 'arabic') {
-                textFlowDirection = 'RTL';
-            } else {
-                textFlowDirection = 'LTR';
-            }
+        materializeKeyboard(keyData);
 
-            materializeKeyboard(keyData);
-        });
     }
 
     //***********************************************************************************
@@ -290,7 +306,6 @@ $.fn.keyboard = function(options) {
         keyboardFillout();
         sizeKeys();
         keyboardAttributes();
-
         if (!keyboardOpen) {
             $('.keyboard-blackout-background').hide();
             $('.keyboard-wrapper').hide();
@@ -581,10 +596,11 @@ $.fn.keyboard = function(options) {
     //***********************************************************************************
     function discardData() {
         $('.keyboard-input-field').val('');
-        $('.keyboard-wrapper').hide();
-        $('.keyboard-blackout-background').hide();
         clearKeyboardState();
         keyboardOpen = false;
+        readKeyboardFile(options.language[languageArrayPosition]);
+
+
     }
 
     //***********************************************************************************
@@ -597,10 +613,9 @@ $.fn.keyboard = function(options) {
             focusedInputField.html($('.keyboard-input-field').val());
         }
         $('.keyboard-input-field').val('');
-        $('.keyboard-wrapper').hide();
-        $('.keyboard-blackout-background').hide();
         clearKeyboardState();
         keyboardOpen = false;
+        readKeyboardFile(options.language[languageArrayPosition]);
     }
 
     //***********************************************************************************
@@ -666,7 +681,7 @@ $.fn.keyboard = function(options) {
         if (!resizeTimerActive) {
             resizeTimerActive = true;
             var resizeDelay = setTimeout(function() {
-                init();
+                readKeyboardFile(options.language[languageArrayPosition]);
                 resizeTimerActive = false;
             }, 500);
         }
