@@ -206,6 +206,7 @@ Due to the nature of JavaScript / jQuery, I currently do not know of a way to lo
 * Mobile Options
 * Hardware-Keyboard Listeners (Perhaps)
 * Number Pad Only Option
+* Keyboard Layout Creator GUI
 
 ## Versioning
 
