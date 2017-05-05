@@ -34,7 +34,7 @@ $.fn.keyboard = function(options) {
 
     //*****Find all of our default options defined here.*****
     options = {
-        language: typeof(options.language) === 'undefined' ? 'english' : options.language,
+        language: typeof(options.language) === 'undefined' ? 'us' : options.language,
         keyColor: typeof(options.keyColor) === 'undefined' ? '#E0E0E0' : options.keyColor,
         keyTextColor: typeof(options.keyTextColor) === 'undefined' ? '#555555' : options.keyTextColor,
         capsLightColor: typeof(options.capsLightColor) === 'undefined' ? '#3498DB' : options.capsLightColor,
