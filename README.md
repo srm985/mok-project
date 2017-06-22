@@ -13,7 +13,7 @@ Update npm to the latest version.
 $ npm install npm@latest -g
 ```
 
-Install [http-server](https://www.npmjs.com/package/http-server) or your own prefered server.
+Install [http-server](https://www.npmjs.com/package/http-server) or your own preferred server.
 
 ```sh
 $ npm install http-server -g
@@ -193,7 +193,7 @@ It should be noted that anything after ```//``` is for your own reference and is
 
 ## Bugs / Drawbacks
 
-I'm not certain if ligature support is fully functioning for keyboards such as Hindi, Punjabi, Arabic, etc... I need your help in verifying these layouts! I do not speak these languages and I've found keyboard layouts very inconsistent. If you find a keyboard that is not function, I'll be happy to make any revisions needed.
+I'm not certain if ligature support is fully functioning for keyboards such as Hindi, Punjabi, Arabic, etc... I need your help in verifying these layouts! I do not speak these languages and I've found keyboard layouts very inconsistent. If you find a keyboard that is not functioning, I'll be happy to make any revisions needed.
 
 I have not personally tested every keyboard and you may find bugs along your journey. I'll work to quickly resolve any issues you might uncover.
 
@@ -203,7 +203,8 @@ Due to the nature of JavaScript / jQuery, I currently do not know of a way to lo
 
 ## Coming Features
 
-* Mobile Options
+* Mobile Support
+* Condensed Keyboard Layout
 * Hardware-Keyboard Listeners (Perhaps)
 * Number Pad Only Option
 * Keyboard Layout Creator GUI
