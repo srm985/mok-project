@@ -14,7 +14,6 @@
     line-height: 18px;
     position: fixed;
     z-index: 9999;
-    width: -webkit-calc(100% - 40px);
     width: calc(100% - 40px);
     min-width: 1004px;
     max-width: 1100px;
@@ -23,13 +22,9 @@
 
 .keyboard-wrapper .keyboard-action-wrapper {
     display: -webkit-box;
-    display: -webkit-flex;
-    display: -ms-flexbox;
     display: flex;
     width: 100%;
     -webkit-box-pack: justify;
-    -webkit-justify-content: space-between;
-    -ms-flex-pack: justify;
     justify-content: space-between;
 }
 
@@ -44,7 +39,6 @@
     cursor: pointer;
     color: #FFFFFF;
     border: none;
-    -webkit-border-radius: 4px;
     border-radius: 4px;
     outline: none;
 }
@@ -67,7 +61,6 @@
     padding-left: 10px;
     color: inherit;
     border: solid 1px #555555;
-    -webkit-border-radius: 4px;
     border-radius: 4px;
     outline: none;
 }
@@ -93,7 +86,6 @@
     vertical-align: middle;
     color: inherit;
     border: none;
-    -webkit-border-radius: 4px;
     border-radius: 4px;
     outline: none;
     background-color: #E0E0E0;
@@ -114,10 +106,8 @@
     width: 7px;
     height: 7px;
     content: '';
-    -webkit-transition: background-color 0.05s ease-in-out;
     transition: background-color 0.05s ease-in-out;
     border: solid 1px #BDBDBD;
-    -webkit-border-radius: 50%;
     border-radius: 50%;
     background-color: transparent;
 }

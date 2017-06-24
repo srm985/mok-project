@@ -139,6 +139,9 @@ $.fn.keyboard = function(options) {
         });
     }
 
+    //***********************************************************************************
+    //*                    Handle specific hardware keypresses                          *
+    //***********************************************************************************
     function hardwareKeypress(key) {
         if ($('.keyboard-wrapper').is(':visible')) {
             switch (key.which) {
@@ -162,7 +165,7 @@ $.fn.keyboard = function(options) {
     //*         Read our keyboard file and parse information into usable tables         *
     //***********************************************************************************
     function readKeyboardFile(file) {
-        var fileData = 'p';
+        var fileData;
 
         if (storedKeyboardObject.keyboardFile != '' && storedKeyboardObject.arrayPosition == languageArrayPosition) {
             parseKeyboardFile(file, storedKeyboardObject.keyboardFile);
@@ -177,8 +180,10 @@ $.fn.keyboard = function(options) {
         }
     }
 
+    //***********************************************************************************
+    //*                      Parse information from keyboard file.                      *
+    //***********************************************************************************
     function parseKeyboardFile(file, data) {
-
         var keyData,
             shiftStateData,
             shiftStateLocation = '',
@@ -269,7 +274,6 @@ $.fn.keyboard = function(options) {
         }
 
         materializeKeyboard(keyData);
-
     }
 
     //***********************************************************************************
@@ -281,7 +285,6 @@ $.fn.keyboard = function(options) {
             keyMapArray = new Array(47);
 
         $.each(keyList, function(i, value) {
-            //keyObject[i] = value.toString().split(/\u0009+/g);
             keyObject[i] = value.toString().replace(/(\t+|\s+)/g, ' ');
             keyObject[i] = keyObject[i].split(' ');
             if (keyMap[keyObject[i][0]] !== undefined) {
@@ -455,7 +458,7 @@ $.fn.keyboard = function(options) {
                     currentKey.data('keyval', currentKey.html().length == 1 ? currentKey.html() : currentKey.data('keyval'));
                 }
             } catch (err) {
-                //
+                //Nada Aquí
             }
 
         });
@@ -518,7 +521,7 @@ $.fn.keyboard = function(options) {
                     $('.keyboard-input-field')[0].selectionEnd = caretPosition;
                     break;
                 case 'space':
-                    //Handled by replacement function above.
+                    //We insert a space character within the string each time the space bar is pressed.
                     break;
                 case 'enter':
                     //User-definable callback.
@@ -599,8 +602,6 @@ $.fn.keyboard = function(options) {
         clearKeyboardState();
         keyboardOpen = false;
         readKeyboardFile(options.language[languageArrayPosition]);
-
-
     }
 
     //***********************************************************************************
