@@ -30,7 +30,8 @@ $.fn.keyboard = function(options) {
         deadkeySet = false,
         textFlowDirection = 'LTR',
         keyboardOpen = false,
-        keyboardWrapperPresent = false;
+        keyboardWrapperPresent = false,
+        keyboardStreamField;
 
     //*****Find all of our default options defined here.*****
     options = {
@@ -53,6 +54,7 @@ $.fn.keyboard = function(options) {
         blackoutColor: typeof(options.blackoutColor) === 'undefined' ? '25, 25, 25, 0.9' : options.blackoutColor,
         allowEscapeCancel: typeof(options.allowEscapeCancel) === 'undefined' ? true : options.allowEscapeCancel,
         allowEnterAccept: typeof(options.allowEnterAccept) === 'undefined' ? true : options.allowEnterAccept,
+        directEnter: typeof(options.directEnter) === 'undefined' ? true : options.directEnter,
     };
 
     //*****Quick cleanup of our language array.*****
@@ -95,29 +97,37 @@ $.fn.keyboard = function(options) {
         readKeyboardFile(options.language[languageArrayPosition]);
 
         //*****Add our event listeners once everything has been materialized.*****
-        pageElement.on('focus click touch', options.inputType, function() {
+        pageElement.on('click touch', options.inputType, function() {
             if ($(this).prop('class') != 'keyboard-input-field') {
                 focusedInputField = $(this);
-                if (focusedInputField.is('input')) {
-                    $('.keyboard-input-field').val(focusedInputField.val());
-                    $('.keyboard-input-field').prop('type', focusedInputField.prop('type'));
-                } else {
-                    $('.keyboard-input-field').val(focusedInputField.html());
-                    $('.keyboard-input-field').prop('type', 'text');
+                keyboardStreamField = focusedInputField;
+
+                //*****If direct enter enabled, don't bother.*****
+                if (!options.directEnter) {
+                    keyboardStreamField = $('.keyboard-input-field');
+                    if (focusedInputField.is('input')) {
+                        keyboardStreamField.val(focusedInputField.val());
+                        keyboardStreamField.prop('type', focusedInputField.prop('type'));
+                    } else {
+                        keyboardStreamField.val(focusedInputField.html());
+                        keyboardStreamField.prop('type', 'text');
+                    }
+                    $('.keyboard-blackout-background').show();
                 }
-                $('.keyboard-blackout-background').show();
+                //************************************************
+
                 $('.keyboard-wrapper').show();
                 keyboardOpen = true;
-                $('.keyboard-input-field').focus();
+                keyboardStreamField.focus();
             }
         });
 
         //*****Listen for keypresses.*****
         $(document).on('click touch', '.keyboard-key', function() {
             var keyRegistered = $(this).data('keyval');
-            if ($('.keyboard-input-field').prop('type') != 'tel' && $('.keyboard-input-field').prop('type') != 'number') {
+            if (keyboardStreamField.prop('type') != 'tel' && keyboardStreamField.prop('type') != 'number') {
                 handleKeypress(keyRegistered);
-            } else if (($('.keyboard-input-field').prop('type') == 'tel' || $('.keyboard-input-field').prop('type') == 'number') && (keyRegistered.match(/\d/) || (keyRegistered.length > 2))) {
+            } else if ((keyboardStreamField.prop('type') == 'tel' || keyboardStreamField.prop('type') == 'number') && (keyRegistered.match(/\d/) || (keyRegistered.length > 2))) {
                 handleKeypress(keyRegistered);
             }
         });
@@ -130,6 +140,19 @@ $.fn.keyboard = function(options) {
         //*****Handle our keyboard accept button.*****
         $(document).on('click touch', '.keyboard-accept-button', function() {
             acceptData();
+        });
+
+        $('body').on('click touch', '*', function() {
+            var elementLayer = $(this);
+            while (elementLayer.parent().length && !elementLayer.hasClass('keyboard-wrapper')) {
+                elementLayer = elementLayer.parent();
+            }
+            console.log(elementLayer.hasClass('keyboard-wrapper'));
+            if (elementLayer.hasClass('keyboard-wrapper')) {
+                clearKeyboardState();
+                keyboardOpen = false;
+                readKeyboardFile(options.language[languageArrayPosition]);
+            }
         });
 
         //*****Provide a little functionality during external keyboard testing.*****
@@ -296,7 +319,11 @@ $.fn.keyboard = function(options) {
             destroyKeys();
             keyboardWrapperPresent = true;
         } else {
-            $('body').prepend('<div class="keyboard-blackout-background"></div><div class="keyboard-wrapper"></div>');
+            $('body').prepend('<div class="keyboard-wrapper"></div>');
+            //*****If direct enter enabled, don't bother.*****
+            if (!options.directEnter) {
+                $('body').prepend('<div class="keyboard-blackout-background"></div>');
+            }
             keyboardWrapperPresent = false;
         }
 
@@ -310,7 +337,10 @@ $.fn.keyboard = function(options) {
         sizeKeys();
         keyboardAttributes();
         if (!keyboardOpen) {
-            $('.keyboard-blackout-background').hide();
+            //*****If direct enter enabled, don't bother.*****
+            if (!options.directEnter) {
+                $('.keyboard-blackout-background').hide();
+            }
             $('.keyboard-wrapper').hide();
         }
     }
@@ -359,7 +389,7 @@ $.fn.keyboard = function(options) {
     //*      Append our extra function keys that we didn't get from the .klc file.      *
     //***********************************************************************************
     function keyboardFillout() {
-        if (!$('.keyboard-action-wrapper').length) {
+        if (!$('.keyboard-action-wrapper').length && !options.directEnter) {
             $('.keyboard-wrapper').prepend('<div class="keyboard-action-wrapper"><button class="keyboard-action-button keyboard-cancel-button">Cancel</button><input type="text" class="keyboard-input-field"><button class="keyboard-action-button keyboard-accept-button">Accept</button></div>');
         }
         $('.keyboard-row:eq(0)').append('<button class="keyboard-key keyboard-key-lg" data-keyval="backspace">Backspace</button>');
@@ -470,7 +500,7 @@ $.fn.keyboard = function(options) {
     function handleKeypress(keyPressed) {
         //*****Convert deadkey to hex and pad with zeros to ensure it's four digits.*****
         var deadkeyLookup = ('0000' + keyPressed.charCodeAt(0).toString(16)).slice(-4),
-            caretPosition = $('.keyboard-input-field')[0].selectionStart;
+            caretPosition = keyboardStreamField[0].selectionStart;
 
         keyPressed = keyPressed.replace('&lt;', '<').replace('&gt;', '>').replace(/\bspace/, ' '); //Acount for &lt; and &gt; escaping.
 
@@ -514,11 +544,11 @@ $.fn.keyboard = function(options) {
                     }
                     break;
                 case 'backspace':
-                    $('.keyboard-input-field').val($('.keyboard-input-field').val().slice(0, caretPosition - 1) + $('.keyboard-input-field').val().slice(caretPosition));
+                    keyboardStreamField.val(keyboardStreamField.val().slice(0, caretPosition - 1) + keyboardStreamField.val().slice(caretPosition));
                     caretPosition -= 1;
-                    $('.keyboard-input-field').focus();
-                    $('.keyboard-input-field')[0].selectionStart = caretPosition;
-                    $('.keyboard-input-field')[0].selectionEnd = caretPosition;
+                    keyboardStreamField.focus();
+                    keyboardStreamField[0].selectionStart = caretPosition;
+                    keyboardStreamField[0].selectionEnd = caretPosition;
                     break;
                 case 'space':
                     //We insert a space character within the string each time the space bar is pressed.
@@ -584,13 +614,17 @@ $.fn.keyboard = function(options) {
             }
 
             //*****Write key value and update input attributes.*****
-            $('.keyboard-input-field').attr('dir', textFlowDirection);
-            $('.keyboard-input-field').val($('.keyboard-input-field').val().slice(0, caretPosition) + keyPressed + $('.keyboard-input-field').val().slice(caretPosition));
+            keyboardStreamField.attr('dir', textFlowDirection);
+            if (keyboardStreamField.attr('contenteditable') === undefined || keyboardStreamField.attr('contenteditable') == false) {
+                keyboardStreamField.val(keyboardStreamField.val().slice(0, caretPosition) + keyPressed + keyboardStreamField.val().slice(caretPosition));
+            } else {
+                keyboardStreamField.html(keyboardStreamField.html().slice(0, caretPosition) + keyPressed + keyboardStreamField.html().slice(caretPosition));
+            }
             //*****Return focus and update caret position.*****
             caretPosition += keyPressed.length;
-            $('.keyboard-input-field').focus();
-            $('.keyboard-input-field')[0].selectionStart = caretPosition;
-            $('.keyboard-input-field')[0].selectionEnd = caretPosition;
+            keyboardStreamField.focus();
+            keyboardStreamField[0].selectionStart = caretPosition;
+            keyboardStreamField[0].selectionEnd = caretPosition;
         }
     }
 
@@ -598,7 +632,7 @@ $.fn.keyboard = function(options) {
     //*                       Discard keyboard data and close.                          *
     //***********************************************************************************
     function discardData() {
-        $('.keyboard-input-field').val('');
+        keyboardStreamField.val('');
         clearKeyboardState();
         keyboardOpen = false;
         readKeyboardFile(options.language[languageArrayPosition]);
@@ -609,11 +643,11 @@ $.fn.keyboard = function(options) {
     //***********************************************************************************
     function acceptData() {
         if (focusedInputField.is('input')) {
-            focusedInputField.val($('.keyboard-input-field').val());
+            focusedInputField.val(keyboardStreamField.val());
         } else {
-            focusedInputField.html($('.keyboard-input-field').val());
+            focusedInputField.html(keyboardStreamField.val());
         }
-        $('.keyboard-input-field').val('');
+        keyboardStreamField.val('');
         clearKeyboardState();
         keyboardOpen = false;
         readKeyboardFile(options.language[languageArrayPosition]);
@@ -629,11 +663,15 @@ $.fn.keyboard = function(options) {
             keyboardWidth = $('.keyboard-wrapper').width();
         $('.keyboard-key').css('background-color', options.keyColor);
         $('.keyboard-key').css('color', options.keyTextColor);
-        $('.keyboard-cancel-button').css('background-color', options.cancelColor);
-        $('.keyboard-cancel-button').css('color', options.cancelTextColor);
-        $('.keyboard-accept-button').css('background-color', options.acceptColor);
-        $('.keyboard-accept-button').css('color', options.acceptTextColor);
-        $('.keyboard-blackout-background').css('background-color', 'rgba(' + options.blackoutColor + ')');
+        //*****If direct enter enabled, don't bother setting these.*****
+        if (!options.directEnter) {
+            $('.keyboard-cancel-button').css('background-color', options.cancelColor);
+            $('.keyboard-cancel-button').css('color', options.cancelTextColor);
+            $('.keyboard-accept-button').css('background-color', options.acceptColor);
+            $('.keyboard-accept-button').css('color', options.acceptTextColor);
+            $('.keyboard-blackout-background').css('background-color', 'rgba(' + options.blackoutColor + ')');
+        }
+        //**************************************************************
         switch (options.keyboardPosition) {
             case 'top':
                 $('.keyboard-wrapper').css('top', '20px');
