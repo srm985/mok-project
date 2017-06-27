@@ -142,16 +142,19 @@ $.fn.keyboard = function(options) {
             acceptData();
         });
 
-        $('body').on('click touch', '*', function() {
+        //*****Handle closure of direct-enter keyboard on element clickaway.*****
+        $(document).on('click touch', '*', function(e) {
+            e.stopPropagation();
             var elementLayer = $(this);
-            while (elementLayer.parent().length && !elementLayer.hasClass('keyboard-wrapper')) {
-                elementLayer = elementLayer.parent();
-            }
-            console.log(elementLayer.hasClass('keyboard-wrapper'));
-            if (elementLayer.hasClass('keyboard-wrapper')) {
-                clearKeyboardState();
-                keyboardOpen = false;
-                readKeyboardFile(options.language[languageArrayPosition]);
+            if (options.inputType.search(elementLayer.attr('type')) < 1 && options.inputType.search(elementLayer.prop('tagName').toLowerCase()) < 1 && elementLayer.prop('contenteditable') != 'true') {
+                while (elementLayer.parent().length && !elementLayer.hasClass('keyboard-wrapper')) {
+                    elementLayer = elementLayer.parent();
+                }
+                if (!elementLayer.hasClass('keyboard-wrapper')) {
+                    clearKeyboardState();
+                    keyboardOpen = false;
+                    readKeyboardFile(options.language[languageArrayPosition]);
+                }
             }
         });
 
