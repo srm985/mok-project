@@ -31,7 +31,8 @@ $.fn.keyboard = function(options) {
         textFlowDirection = 'LTR',
         keyboardOpen = false,
         keyboardWrapperPresent = false,
-        inputFieldType = 'type',
+        inputFieldType = 'text',
+        keyboardInputType = 'text',
         keyboardStreamField;
 
     //*****Find all of our default options defined here.*****
@@ -56,6 +57,19 @@ $.fn.keyboard = function(options) {
         allowEscapeCancel: typeof(options.allowEscapeCancel) === 'undefined' ? true : options.allowEscapeCancel,
         allowEnterAccept: typeof(options.allowEnterAccept) === 'undefined' ? true : options.allowEnterAccept,
         directEnter: typeof(options.directEnter) === 'undefined' ? true : options.directEnter,
+        keyCharacterRegex: typeof(options.keyCharacterRegex) === 'undefined' ? { number: /[0-9]|[eE]|\.|\+|\-/, tel: /[0-9]|\.|\+|\-|\#|\(|\)/ } : options.keyCharacterRegex,
+        inputFieldRegex: typeof(options.inputFieldRegex) === 'undefined' ? { number: /^(-)?(((\d+)|(\d+\.(\d+)?)|(\.(\d+)?))([eE]([-+])?(\d+)?)?)?$/} : options.inputFieldRegex,
+    };
+
+    //*****Define our default permitted values and attributes for input types.*****
+    var inputAttributes = {
+        disabled: '',
+        readonly: '',
+        maxlength: '',
+        min: '',
+        max: '',
+        placeholder: ''
+
     };
 
     //*****Quick cleanup of our language array.*****
@@ -100,37 +114,53 @@ $.fn.keyboard = function(options) {
         //*****Add our event listeners once everything has been materialized.*****
         pageElement.on('click touch', options.inputType, function() {
             if ($(this).prop('class') != 'keyboard-input-field') {
-                focusedInputField = $(this);
-                keyboardStreamField = focusedInputField;
 
-                //*****If direct enter enabled, don't bother.*****
-                if (!options.directEnter) {
-                    keyboardStreamField = $('.keyboard-input-field');
-                    if (focusedInputField.is('input')) {
-                        keyboardStreamField.val(focusedInputField.val());
-                        keyboardStreamField.prop('type', focusedInputField.prop('type'));
-                    } else {
-                        keyboardStreamField.val(focusedInputField.html());
-                        keyboardStreamField.prop('type', 'text');
+                //*****Let's capture a few attributes about our input field.*****
+                var tempElement = $(this);
+                $.each(inputAttributes, function(i, value) {
+                    inputAttributes[i] = tempElement.prop(i) === undefined ? '' : tempElement.prop(i);
+                });
+
+                if (!inputAttributes.disabled && !inputAttributes.readonly) {
+                    focusedInputField = $(this);
+                    keyboardStreamField = focusedInputField;
+
+                    //*****If direct enter enabled, don't bother.*****
+                    if (!options.directEnter) {
+                        keyboardStreamField = $('.keyboard-input-field');
+                        if (focusedInputField.is('input')) {
+
+                            inputFieldType = focusedInputField.prop('type');
+                            keyboardInputType = inputFieldType == 'password' ? 'password' : 'text';
+
+                            keyboardStreamField.prop('placeholder', inputAttributes.placeholder);
+                            keyboardStreamField.val(focusedInputField.val());
+                            keyboardStreamField.prop('type', keyboardInputType);
+                        } else {
+                            keyboardStreamField.val(focusedInputField.html());
+                            keyboardStreamField.prop('type', 'text');
+                        }
+                        $('.keyboard-blackout-background').show();
                     }
-                    $('.keyboard-blackout-background').show();
-                }
-                //************************************************
+                    //************************************************
 
-                $('.keyboard-wrapper').show();
-                keyboardOpen = true;
-                keyboardStreamField.focus();
+                    $('.keyboard-wrapper').show();
+                    keyboardOpen = true;
+                    keyboardStreamField.focus();
+                }
             }
         });
 
         //*****Listen for keypresses.*****
         $(document).on('click touch', '.keyboard-key', function() {
             var keyRegistered = $(this).data('keyval');
-            if (keyboardStreamField.prop('type') != 'tel' && keyboardStreamField.prop('type') != 'number') {
-                handleKeypress(keyRegistered);
-            } else if ((keyboardStreamField.prop('type') == 'tel' || keyboardStreamField.prop('type') == 'number') && (keyRegistered.match(/\d/) || (keyRegistered.length > 2))) {
-                handleKeypress(keyRegistered);
+
+            /*if (inputTypeValues.hasOwnProperty(inputFieldType) && keyRegistered.length < 2) {
+                keyRegistered = keyRegistered.match(inputTypeValues[inputFieldType]);
+                keyRegistered = keyRegistered === null ? '' : keyRegistered.toString();
             }
+            console.log(keyRegistered);*/
+            handleKeypress(keyRegistered);
         });
 
         //*****Handle our keyboard close button.*****
@@ -146,15 +176,17 @@ $.fn.keyboard = function(options) {
         //*****Handle closure of direct-enter keyboard on element clickaway.*****
         $(document).on('click touch', '*', function(e) {
             e.stopPropagation();
-            var elementLayer = $(this);
-            if (options.inputType.search(elementLayer.attr('type')) < 1 && options.inputType.search(elementLayer.prop('tagName').toLowerCase()) < 1 && elementLayer.prop('contenteditable') != 'true') {
-                while (elementLayer.parent().length && !elementLayer.hasClass('keyboard-wrapper')) {
-                    elementLayer = elementLayer.parent();
-                }
-                if (!elementLayer.hasClass('keyboard-wrapper')) {
-                    clearKeyboardState();
-                    keyboardOpen = false;
-                    readKeyboardFile(options.language[languageArrayPosition]);
+            if (keyboardOpen && options.directEnter) {
+                var elementLayer = $(this);
+                if (options.inputType.search(elementLayer.attr('type')) < 1 && options.inputType.search(elementLayer.prop('tagName').toLowerCase()) < 1 && elementLayer.prop('contenteditable') != 'true') {
+                    while (elementLayer.parent().length && !elementLayer.hasClass('keyboard-wrapper')) {
+                        elementLayer = elementLayer.parent();
+                    }
+                    if (!elementLayer.hasClass('keyboard-wrapper')) {
+                        clearKeyboardState();
+                        keyboardOpen = false;
+                        readKeyboardFile(options.language[languageArrayPosition]);
+                    }
                 }
             }
         });
@@ -619,8 +651,18 @@ $.fn.keyboard = function(options) {
 
             //*****Write key value and update input attributes.*****
             keyboardStreamField.attr('dir', textFlowDirection);
-            if (keyboardStreamField.attr('contenteditable') === undefined || keyboardStreamField.attr('contenteditable') == false) {
+            if (focusedInputField.prop('contenteditable') === undefined || focusedInputField.prop('contenteditable') != true) {
+                var tempString = keyboardStreamField.val(),
+                    newString; //*****Store a temp copy in case we need to revert.*****
+
                 keyboardStreamField.val(keyboardStreamField.val().slice(0, caretPosition) + keyPressed + keyboardStreamField.val().slice(caretPosition));
+                newString = keyboardStreamField.val();
+
+                //*****Here we check if adding a character violated any user-defined rules. We check after the fact because of ligature and dead keys.*****
+                if ((inputAttributes.maxlength != '-1' && newString.length > inputAttributes.maxlength) || (inputFieldType == 'number' && inputAttributes.max != '' && inputAttributes.max != '-1' && newString > inputAttributes.max) || (inputFieldType == 'number' && inputAttributes.min != '' && inputAttributes.min != '-1' && newString < inputAttributes.min) || keyPressed.search(options.keyCharacterRegex[inputFieldType]) < 0 || newString.search(options.inputFieldRegex[inputFieldType]) < 0) {
+                    keyboardStreamField.val(tempString);
+                }
+                //*****************************************************************************************************************************************
             } else {
                 keyboardStreamField.html(keyboardStreamField.html().slice(0, caretPosition) + keyPressed + keyboardStreamField.html().slice(caretPosition));
             }

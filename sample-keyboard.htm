@@ -13,7 +13,7 @@
                 alert('Hey there! This is a callback function example.');
             },
             keyboardPosition: 'bottom',
-            directEnter: true
+            directEnter: false
         });
     });
     </script>
@@ -23,9 +23,9 @@
 
 <body>
     <label>Login:</label>
-    <input type="text" name="">
+    <input type="text" placeholder="username">
     <label>Password:</label>
-    <input type="password" name="">
+    <input type="password">
     <br>
     <br>
     <p contenteditable="true">This is a content editable paragraph!</p>
@@ -33,9 +33,32 @@
     <br>
     <label>Phone:</label>
     <input type="tel" name="">
+    <label>Phone Read-Only:</label>
+    <input type="tel" name="" readonly>
+    <label>Phone Disabled:</label>
+    <input type="tel" name="" disabled>
+    <br>
+    <br>
+    <br>
+    <label>Default Number:</label>
+    <input type="number">
+    <br>
+    <br>
+    <br>
+    <label>Text Max Length (5):</label>
+    <input type="text" maxlength="5">
+    <br>
+    <br>
+    <br>
+    <label>Number Min (17):</label>
+    <input type="number" min="17">
+    <label>Number Max (45):</label>
+    <input type="number" max="45">
+    <br>
     <br>
     <br>
     <label>Text Area:</label>
+    <br>
     <br>
     <textarea>Text areas will be parsed into the keyboard input field as inputs, type=text.</textarea>
     <br>
