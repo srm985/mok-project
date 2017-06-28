@@ -30,7 +30,8 @@ $.fn.keyboard = function(options) {
         deadkeySet = false,
         textFlowDirection = 'LTR',
         keyboardOpen = false,
-        keyboardWrapperPresent = false;
+        keyboardWrapperPresent = false,
+        inputFieldType = 'type';
 
     //*****Find all of our default options defined here.*****
     options = {
@@ -100,7 +101,9 @@ $.fn.keyboard = function(options) {
                 focusedInputField = $(this);
                 if (focusedInputField.is('input')) {
                     $('.keyboard-input-field').val(focusedInputField.val());
-                    $('.keyboard-input-field').prop('type', focusedInputField.prop('type'));
+                    //*****Swap our number field to type of tel. Only loss is the increment/decrement feature.
+                    inputFieldType = focusedInputField.prop('type') == 'number' ? 'tel' : focusedInputField.prop('type');
+                    $('.keyboard-input-field').prop('type', inputFieldType);
                 } else {
                     $('.keyboard-input-field').val(focusedInputField.html());
                     $('.keyboard-input-field').prop('type', 'text');
