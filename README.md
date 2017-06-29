@@ -3,6 +3,8 @@ The goal of this project is to materialize a well-styled, onscreen keyboard capa
 
 [Super Basic Demo](http://www.seanmcquay.com/mok-project/sample-keyboard.htm)
 
+Current work is underway to develop a variant of the keyboard which is not only condensed in layout but also allows for the keyboard to be appended near the selected input element to facilitate direct entry into the selected field instead of using a modal and dedicated entry field. _(28 June 2017)_
+
 ## Installation / Running
 
 Install [Node.js](https://nodejs.org/en/download/)
@@ -61,6 +63,8 @@ To initiate an instance of the keyboard within your application you may include 
 | blackoutColor | '25, 25, 25, 0.9' | Defines color and opacity of blackout background. Passed as RGBA string. |
 | allowEscapeCancel | true | Cancel keyboard input with hardware keyboard [Escape] key. |
 | allowEnterAccept | true | Accept keyboard input with hardware keyboard [Enter] key. |
+| keyCharacterRegex | { number: /[0-9]&#124;[eE]&#124;&#92;.&#124;&#92;+&#124;&#92;-/, tel: /[0-9]&#124;&#92;.&#124;&#92;+&#124;&#92;-&#124;&#92;#&#124;&#92;(&#124;&#92;)/ } | Define regular expressions for input field types. These pertain to the individual key pressed, not the whole accepted pattern. The object keys must match identically to the input type. |
+| inputFieldRegex | { number: /^(-)?(((&#92;d+)&#124;(&#92;d+&#92;.(&#92;d+)?)&#124;(&#92;.(&#92;d+)?))([eE]([-+])?(&#92;d+)?)?)?$/ } | Define regular expressions for the accepted patterns of input field types. These patterns serve to further restrict browser-specific prepopulated patterns. For example, you may NOT generate a regex to allow letters in an input[type="number"]. Ensure these are whole pattern matches handled by the prepension and appension of ^ and $. The object keys must match identically to the input type. |
 
 
 #### Callbacks
@@ -193,19 +197,30 @@ It should be noted that anything after ```//``` is for your own reference and is
 
 ## Bugs / Drawbacks
 
+##### Ligature
 I'm not certain if ligature support is fully functioning for keyboards such as Hindi, Punjabi, Arabic, etc... I need your help in verifying these layouts! I do not speak these languages and I've found keyboard layouts very inconsistent. If you find a keyboard that is not functioning, I'll be happy to make any revisions needed.
 
+##### Testing
 I have not personally tested every keyboard and you may find bugs along your journey. I'll work to quickly resolve any issues you might uncover.
 
+##### Mobile Support
 This initial release is not intended to be mobile friendly. It's original scope was intended for those devices such as terminals and kiosks. It is the intention to provide mobile support at a later time.
 
+##### Front End File Handling
 Due to the nature of JavaScript / jQuery, I currently do not know of a way to load all keyboard layouts in a directory. You must declare all keyboards which you wish to use.
+
+##### Conteneditable
+I have not spent much time investigating how nested markup within contenteditable elements will effect the keyboard. I'm not sure the use case and therefore have not pursued this.
+
+##### Pattern Honoring
+At a future point, I'd like to support honoring of input patterns. These patterns are typically evaluated on form submission, but I'd like to eventually support them prior to this point.
 
 ## Coming Features
 
 * Mobile Support
+* Direct Entry (No Modal)
 * Condensed Keyboard Layout
-* Hardware-Keyboard Listeners (Perhaps)
+* Hardware-Keyboard Mapping (Perhaps)
 * Number Pad Only Option
 * Keyboard Layout Creator GUI
 
@@ -222,3 +237,9 @@ See also the list of [contributors](https://github.com/srm985/mok-project/contri
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](https://github.com/srm985/mok-project/blob/master/LICENSE) file for details.
+
+## Change Log
+
+#### Version 1.1
+
+In this release I have addressed several issues related to how the keyboard handles various input types. Beyond that, I have implemented regular expressions to handle input attribute validations. The keyboard also now respects the attributes 'disabled' and 'readonly'. Added the object inputAttributes to collect and organize these attributes. 
