@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <script src="http://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
     <script type="text/javascript" src="/src/js/keyboard.js"></script>
     <link rel="stylesheet" type="text/css" href="/src/css/keyboard.css">
     <script type="text/javascript">
@@ -12,7 +12,8 @@
             enterKey: function() {
                 alert('Hey there! This is a callback function example.');
             },
-            keyboardPosition: 'bottom'
+            keyboardPosition: 'bottom',
+            directEnter: false
         });
     });
     </script>
@@ -22,9 +23,9 @@
 
 <body>
     <label>Login:</label>
-    <input type="text" name="">
+    <input type="text" placeholder="username">
     <label>Password:</label>
-    <input type="password" name="">
+    <input type="password">
     <br>
     <br>
     <p contenteditable="true">This is a content editable paragraph!</p>
@@ -32,9 +33,32 @@
     <br>
     <label>Phone:</label>
     <input type="tel" name="">
+    <label>Phone Read-Only:</label>
+    <input type="tel" name="" readonly>
+    <label>Phone Disabled:</label>
+    <input type="tel" name="" disabled>
+    <br>
+    <br>
+    <br>
+    <label>Default Number:</label>
+    <input type="number">
+    <br>
+    <br>
+    <br>
+    <label>Text Max Length (5):</label>
+    <input type="text" maxlength="5">
+    <br>
+    <br>
+    <br>
+    <label>Number Min (7):</label>
+    <input type="number" min="7">
+    <label>Number Max (45):</label>
+    <input type="number" max="45">
+    <br>
     <br>
     <br>
     <label>Text Area:</label>
+    <br>
     <br>
     <textarea>Text areas will be parsed into the keyboard input field as inputs, type=text.</textarea>
     <br>
