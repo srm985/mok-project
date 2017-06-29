@@ -58,10 +58,10 @@ $.fn.keyboard = function(options) {
         allowEnterAccept: typeof(options.allowEnterAccept) === 'undefined' ? true : options.allowEnterAccept,
         directEnter: typeof(options.directEnter) === 'undefined' ? true : options.directEnter,
         keyCharacterRegex: typeof(options.keyCharacterRegex) === 'undefined' ? { number: /[0-9]|[eE]|\.|\+|\-/, tel: /[0-9]|\.|\+|\-|\#|\(|\)/ } : options.keyCharacterRegex,
-        inputFieldRegex: typeof(options.inputFieldRegex) === 'undefined' ? { number: /^(-)?(((\d+)|(\d+\.(\d+)?)|(\.(\d+)?))([eE]([-+])?(\d+)?)?)?$/} : options.inputFieldRegex,
+        inputFieldRegex: typeof(options.inputFieldRegex) === 'undefined' ? { number: /^(-)?(((\d+)|(\d+\.(\d+)?)|(\.(\d+)?))([eE]([-+])?(\d+)?)?)?$/ } : options.inputFieldRegex,
     };
 
-    //*****Define our default permitted values and attributes for input types.*****
+    //*****Define our attributes that we care about.*****
     var inputAttributes = {
         disabled: '',
         readonly: '',
@@ -137,6 +137,7 @@ $.fn.keyboard = function(options) {
                             keyboardStreamField.val(focusedInputField.val());
                             keyboardStreamField.prop('type', keyboardInputType);
                         } else {
+                            inputFieldType = 'text';
                             keyboardStreamField.val(focusedInputField.html());
                             keyboardStreamField.prop('type', 'text');
                         }
@@ -154,12 +155,6 @@ $.fn.keyboard = function(options) {
         //*****Listen for keypresses.*****
         $(document).on('click touch', '.keyboard-key', function() {
             var keyRegistered = $(this).data('keyval');
-
-            /*if (inputTypeValues.hasOwnProperty(inputFieldType) && keyRegistered.length < 2) {
-                keyRegistered = keyRegistered.match(inputTypeValues[inputFieldType]);
-                keyRegistered = keyRegistered === null ? '' : keyRegistered.toString();
-            }
-            console.log(keyRegistered);*/
             handleKeypress(keyRegistered);
         });
 
@@ -258,7 +253,6 @@ $.fn.keyboard = function(options) {
         ligatureObject = '';
 
         //*****Extract our keyboard key data.*****
-        //keyData = data.match(/[0-9][\w]?(\t|\s)\w+(\t|\s)[(\t|\s)]?\w+(\t|\s)([-]?\w+|%%)[@]?(\t|\s)([-]?\w+|%%)[@]?(\t|\s)([-]?\w+|%%)[@]?((\t|\s)([-]?\w+|%%)[@]?)?((\t|\s)([-]?\w+|%%)[@]?)?((\t|\s)([-]?\w+|%%)[@]?)?(\t|\s)(\t|\s)?\/\//g);
         data = data.replace(/\u0000/g, '');
         keyData = data.match(/\d(\w)?\s+\w+\s+\d\s+(-1|\w+@?|%%)\s+(-1|\w+@?|%%)\s+(-1|\w+@?|%%)(\s+(-1|\w+@?|%%))?(\s+(-1|\w+@?|%%))?(\s+(-1|\w+@?|%%))?\s+\/\//g);
 
@@ -281,7 +275,6 @@ $.fn.keyboard = function(options) {
                 } else if (value.indexOf('Shft') != -1) {
                     shiftStateObject += '"shift": ';
                 }
-                //shiftStateObject += value.match(/\w{6} [0-9]/).toString().slice(-1) + ', ';
                 shiftStateObject += value.match(/\w{6}\s[0-9]/).toString().slice(-1) + ', ';
             });
             shiftStateObject = JSON.parse('{' + shiftStateObject.toString().slice(0, -2) + '}');
@@ -397,7 +390,6 @@ $.fn.keyboard = function(options) {
         $('.keyboard-wrapper').append('<div class="keyboard-row"></div>');
         $.each(keyListSplit, function(i, value) {
             if (value !== undefined) {
-                //keyObject = { default: (value[3] == '//' || value[3] == '-1' || value[3] === undefined) ? '-1' : value[3], shift: (value[4] == '//' || value[4] == '-1' || value[4] === undefined) ? '-1' : value[4], altgrp: (value[6] == '//' || value[6] == '-1' || value[6] === undefined) ? '-1' : value[6], shift_altgrp: (value[7] == '//' || value[7] == '-1' || value[7] === undefined) ? '-1' : value[7] };
                 keyObject = { default: determineKey(value[shiftStateObject.default-1], value[1]), shift: determineKey(value[shiftStateObject.shift - 1], value[1]), altgrp: determineKey(value[shiftStateObject.altgrp - 1], value[1]), shift_altgrp: determineKey(value[shiftStateObject.shift_altgrp - 1], value[1]) };
             } else {
                 keyObject = { default: '-1', shift: '-1', altgrp: '-1', shift_altgrp: '-1' };
@@ -651,21 +643,20 @@ $.fn.keyboard = function(options) {
 
             //*****Write key value and update input attributes.*****
             keyboardStreamField.attr('dir', textFlowDirection);
-            if (focusedInputField.prop('contenteditable') === undefined || focusedInputField.prop('contenteditable') != true) {
-                var tempString = keyboardStreamField.val(),
-                    newString; //*****Store a temp copy in case we need to revert.*****
+            //*****Store before and after copies in case we need to revert.*****
+            var tempString = keyboardStreamField.val(),
+                newString; 
 
-                keyboardStreamField.val(keyboardStreamField.val().slice(0, caretPosition) + keyPressed + keyboardStreamField.val().slice(caretPosition));
-                newString = keyboardStreamField.val();
+            keyboardStreamField.val(keyboardStreamField.val().slice(0, caretPosition) + keyPressed + keyboardStreamField.val().slice(caretPosition));
+            newString = keyboardStreamField.val();
 
-                //*****Here we check if adding a character violated any user-defined rules. We check after the fact because of ligature and dead keys.*****
-                if ((inputAttributes.maxlength != '-1' && newString.length > inputAttributes.maxlength) || (inputFieldType == 'number' && inputAttributes.max != '' && inputAttributes.max != '-1' && newString > inputAttributes.max) || (inputFieldType == 'number' && inputAttributes.min != '' && inputAttributes.min != '-1' && newString < inputAttributes.min) || keyPressed.search(options.keyCharacterRegex[inputFieldType]) < 0 || newString.search(options.inputFieldRegex[inputFieldType]) < 0) {
-                    keyboardStreamField.val(tempString);
-                }
-                //*****************************************************************************************************************************************
-            } else {
-                keyboardStreamField.html(keyboardStreamField.html().slice(0, caretPosition) + keyPressed + keyboardStreamField.html().slice(caretPosition));
+            //*****Here we check if adding a character violated any user-defined rules. We check after the fact because of ligature and dead keys.*****
+            if ((inputAttributes.maxlength != '-1' && inputAttributes.maxlength != '' && newString.length > inputAttributes.maxlength) || (inputFieldType == 'number' && inputAttributes.max != '' && inputAttributes.max != '-1' && (newString * 1) > (inputAttributes.max * 1)) || (inputFieldType == 'number' && inputAttributes.min != '' && inputAttributes.min != '-1' && (newString * 1) < (inputAttributes.min * 1)) || keyPressed.search(options.keyCharacterRegex[inputFieldType]) < 0 || newString.search(options.inputFieldRegex[inputFieldType]) < 0) {
+                keyboardStreamField.val(tempString);
+                caretPosition--;
             }
+            //*****************************************************************************************************************************************
+
             //*****Return focus and update caret position.*****
             caretPosition += keyPressed.length;
             keyboardStreamField.focus();
