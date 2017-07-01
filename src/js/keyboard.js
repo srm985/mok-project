@@ -56,7 +56,7 @@ $.fn.keyboard = function(options) {
         blackoutColor: typeof(options.blackoutColor) === 'undefined' ? '25, 25, 25, 0.9' : options.blackoutColor,
         allowEscapeCancel: typeof(options.allowEscapeCancel) === 'undefined' ? true : options.allowEscapeCancel,
         allowEnterAccept: typeof(options.allowEnterAccept) === 'undefined' ? true : options.allowEnterAccept,
-        directEnter: typeof(options.directEnter) === 'undefined' ? true : options.directEnter,
+        directEnter: typeof(options.directEnter) === 'undefined' ? false : options.directEnter,
         keyCharacterRegex: typeof(options.keyCharacterRegex) === 'undefined' ? { number: /[0-9]|[eE]|\.|\+|\-/, tel: /[0-9]|\.|\+|\-|\#|\(|\)/ } : options.keyCharacterRegex,
         inputFieldRegex: typeof(options.inputFieldRegex) === 'undefined' ? { number: /^(-)?(((\d+)|(\d+\.(\d+)?)|(\.(\d+)?))([eE]([-+])?(\d+)?)?)?$/ } : options.inputFieldRegex,
     };
