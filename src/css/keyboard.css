@@ -49,6 +49,7 @@
   font-family: inherit;
   font-size: inherit;
   line-height: inherit;
+  box-sizing: content-box;
   width: 60%;
   height: 36px;
   padding-right: 10px;
