@@ -17,91 +17,80 @@
   min-width: 1004px;
   max-width: 1100px;
   color: #555555; }
-
-.keyboard-wrapper .keyboard-action-wrapper {
-  display: -webkit-box;
-  display: flex;
-  width: 100%;
-  -webkit-box-pack: justify;
-  justify-content: space-between; }
-
-.keyboard-wrapper .keyboard-action-button {
-  font-family: inherit;
-  font-size: inherit;
-  display: inline;
-  width: 15%;
-  height: 40px;
-  margin: 0 5px;
-  padding: 0;
-  cursor: pointer;
-  color: #FFFFFF;
-  border: none;
-  border-radius: 4px;
-  outline: none; }
-
-.keyboard-wrapper .keyboard-cancel-button {
-  background-color: #E74C3C; }
-
-.keyboard-wrapper .keyboard-accept-button {
-  background-color: #2ECC71; }
-
-.keyboard-wrapper .keyboard-input-field {
-  font-family: inherit;
-  font-size: inherit;
-  line-height: inherit;
-  box-sizing: content-box;
-  width: 60%;
-  height: 36px;
-  padding-right: 10px;
-  padding-left: 10px;
-  color: inherit;
-  border: solid 1px #555555;
-  border-radius: 4px;
-  outline: none; }
-
-.keyboard-row {
-  font-family: inherit;
-  font-size: inherit;
-  line-height: inherit;
-  width: 100%;
-  height: 50px;
-  margin: 20px 0; }
-
-.keyboard-key {
-  font-family: inherit;
-  font-size: inherit;
-  line-height: inherit;
-  display: inline;
-  height: 100%;
-  margin: 0 5px;
-  padding: 0;
-  cursor: pointer;
-  vertical-align: middle;
-  color: inherit;
-  border: none;
-  border-radius: 4px;
-  outline: none;
-  background-color: #E0E0E0; }
-
-.keyboard-key:focus {
-  outline: none; }
-
-.caps-lock-key {
-  position: relative; }
-
-.caps-lock-key:before {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  width: 7px;
-  height: 7px;
-  content: '';
-  transition: background-color 0.05s ease-in-out;
-  border: solid 1px #BDBDBD;
-  border-radius: 50%;
-  background-color: transparent; }
-
-.caps-lock-key-active:before {
-  background-color: #3498DB; }
+  .keyboard-wrapper .keyboard-action-wrapper {
+    display: -webkit-box;
+    display: flex;
+    width: 100%;
+    -webkit-box-pack: justify;
+    justify-content: space-between; }
+  .keyboard-wrapper .keyboard-action-button {
+    font-family: inherit;
+    font-size: inherit;
+    display: inline;
+    width: 15%;
+    height: 40px;
+    margin: 0 5px;
+    padding: 0;
+    cursor: pointer;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 4px;
+    outline: none; }
+  .keyboard-wrapper .keyboard-accept-button {
+    background-color: #2ECC71; }
+  .keyboard-wrapper .keyboard-cancel-button {
+    background-color: #E74C3C; }
+  .keyboard-wrapper .keyboard-input-field {
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+    box-sizing: content-box;
+    width: 60%;
+    height: 36px;
+    padding-right: 10px;
+    padding-left: 10px;
+    color: inherit;
+    border: solid 1px #555555;
+    border-radius: 4px;
+    outline: none; }
+  .keyboard-wrapper .keyboard-row {
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+    width: 100%;
+    height: 50px;
+    margin: 20px 0; }
+  .keyboard-wrapper .keyboard-key {
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+    display: inline;
+    height: 100%;
+    margin: 0 5px;
+    padding: 0;
+    cursor: pointer;
+    vertical-align: middle;
+    color: inherit;
+    border: none;
+    border-radius: 4px;
+    outline: none;
+    background-color: #E0E0E0; }
+  .keyboard-wrapper .keyboard-key:focus {
+    outline: none; }
+  .keyboard-wrapper .caps-lock-key {
+    position: relative; }
+  .keyboard-wrapper .caps-lock-key:before {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 7px;
+    height: 7px;
+    content: '';
+    transition: background-color 0.05s ease-in-out;
+    border: solid 1px #BDBDBD;
+    border-radius: 50%;
+    background-color: transparent; }
+  .keyboard-wrapper .caps-lock-key-active:before {
+    background-color: #3498DB; }
 
 /*# sourceMappingURL=keyboard.css.map */

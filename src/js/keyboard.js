@@ -124,15 +124,13 @@ $.fn.keyboard = function(options) {
                 if (!inputAttributes.disabled && !inputAttributes.readonly) {
                     focusedInputField = $(this);
                     keyboardStreamField = focusedInputField;
+                    inputFieldType = focusedInputField.prop('type');
 
                     //*****If direct enter enabled, don't bother.*****
                     if (!options.directEnter) {
                         keyboardStreamField = $('.keyboard-input-field');
                         if (focusedInputField.is('input')) {
-
-                            inputFieldType = focusedInputField.prop('type');
                             keyboardInputType = inputFieldType == 'password' ? 'password' : 'text';
-
                             keyboardStreamField.prop('placeholder', inputAttributes.placeholder);
                             keyboardStreamField.val(focusedInputField.val());
                             keyboardStreamField.prop('type', keyboardInputType);
@@ -173,7 +171,7 @@ $.fn.keyboard = function(options) {
             e.stopPropagation();
             if (keyboardOpen && options.directEnter) {
                 var elementLayer = $(this);
-                if (options.inputType.search(elementLayer.attr('type')) < 1 && options.inputType.search(elementLayer.prop('tagName').toLowerCase()) < 1 && elementLayer.prop('contenteditable') != 'true') {
+                if ((options.inputType.search(elementLayer.attr('type')) < 1 || elementLayer.prop('readonly')) && options.inputType.search(elementLayer.prop('tagName').toLowerCase()) < 1 && elementLayer.prop('contenteditable') != 'true') {
                     while (elementLayer.parent().length && !elementLayer.hasClass('keyboard-wrapper')) {
                         elementLayer = elementLayer.parent();
                     }
@@ -528,7 +526,10 @@ $.fn.keyboard = function(options) {
     function handleKeypress(keyPressed) {
         //*****Convert deadkey to hex and pad with zeros to ensure it's four digits.*****
         var deadkeyLookup = ('0000' + keyPressed.charCodeAt(0).toString(16)).slice(-4),
-            caretPosition = keyboardStreamField[0].selectionStart;
+            caretPosition;
+
+        keyboardStreamField.prop('type','text');
+        caretPosition = keyboardStreamField[0].selectionStart;
 
         keyPressed = keyPressed.replace('&lt;', '<').replace('&gt;', '>').replace(/\bspace/, ' '); //Acount for &lt; and &gt; escaping.
 
@@ -645,7 +646,7 @@ $.fn.keyboard = function(options) {
             keyboardStreamField.attr('dir', textFlowDirection);
             //*****Store before and after copies in case we need to revert.*****
             var tempString = keyboardStreamField.val(),
-                newString; 
+                newString;
 
             keyboardStreamField.val(keyboardStreamField.val().slice(0, caretPosition) + keyPressed + keyboardStreamField.val().slice(caretPosition));
             newString = keyboardStreamField.val();
