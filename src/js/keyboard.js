@@ -68,8 +68,8 @@ $.fn.keyboard = function(options) {
         maxlength: '',
         min: '',
         max: '',
-        placeholder: ''
-
+        placeholder: '',
+        type: ''
     };
 
     //*****Quick cleanup of our language array.*****
@@ -113,17 +113,23 @@ $.fn.keyboard = function(options) {
 
         //*****Add our event listeners once everything has been materialized.*****
         pageElement.on('click touch', options.inputType, function() {
-            if ($(this).prop('class') != 'keyboard-input-field') {
+            var clickedElement;
+
+            console.log($(this).is(keyboardStreamField));
+
+            if (!$(this).is(keyboardStreamField)) {
+                clickedElement = $(this);
 
                 //*****Let's capture a few attributes about our input field.*****
-                var tempElement = $(this);
+                var tempElement = clickedElement;
                 $.each(inputAttributes, function(i, value) {
                     inputAttributes[i] = tempElement.prop(i) === undefined ? '' : tempElement.prop(i);
                 });
 
+                console.log(inputAttributes);
+
                 if (!inputAttributes.disabled && !inputAttributes.readonly) {
-                    focusedInputField = $(this);
-                    keyboardStreamField = focusedInputField;
+                    focusedInputField = clickedElement;
                     inputFieldType = focusedInputField.prop('type');
 
                     //*****If direct enter enabled, don't bother.*****
@@ -140,6 +146,16 @@ $.fn.keyboard = function(options) {
                             keyboardStreamField.prop('type', 'text');
                         }
                         $('.keyboard-blackout-background').show();
+                    } else if (options.directEnter && inputAttributes.type != 'text') {
+                        keyboardStreamField = focusedInputField;
+                        keyboardStreamField.prop('type', 'text');
+                        clickedElement.on('blur', function(e) {
+                            console.log(e.relatedTarget === null);
+                            if (e.relatedTarget === null || e.relatedTarget.className.search('keyboard-element') < 0) {
+                                focusedInputField.prop('type', inputAttributes.type);
+                                console.log('changing');
+                            }
+                        });
                     }
                     //************************************************
 
@@ -171,11 +187,11 @@ $.fn.keyboard = function(options) {
             e.stopPropagation();
             if (keyboardOpen && options.directEnter) {
                 var elementLayer = $(this);
-                if ((options.inputType.search(elementLayer.attr('type')) < 1 || elementLayer.prop('readonly')) && options.inputType.search(elementLayer.prop('tagName').toLowerCase()) < 1 && elementLayer.prop('contenteditable') != 'true') {
+                if ((options.inputType.search(elementLayer.prop('type')) < 1 || elementLayer.prop('readonly')) && options.inputType.search(elementLayer.prop('tagName').toLowerCase()) < 1 && elementLayer.prop('contenteditable') != 'true') {
                     while (elementLayer.parent().length && !elementLayer.hasClass('keyboard-wrapper')) {
                         elementLayer = elementLayer.parent();
                     }
-                    if (!elementLayer.hasClass('keyboard-wrapper')) {
+                    if (!elementLayer.hasClass('keyboard-element')) {
                         clearKeyboardState();
                         keyboardOpen = false;
                         readKeyboardFile(options.language[languageArrayPosition]);
@@ -370,6 +386,8 @@ $.fn.keyboard = function(options) {
             }
             $('.keyboard-wrapper').hide();
         }
+
+        $('.keyboard-wrapper, .keyboard-wrapper *').addClass('keyboard-element'); //Classify keyboard elements.
     }
 
     //***********************************************************************************
@@ -528,7 +546,6 @@ $.fn.keyboard = function(options) {
         var deadkeyLookup = ('0000' + keyPressed.charCodeAt(0).toString(16)).slice(-4),
             caretPosition;
 
-        keyboardStreamField.prop('type','text');
         caretPosition = keyboardStreamField[0].selectionStart;
 
         keyPressed = keyPressed.replace('&lt;', '<').replace('&gt;', '>').replace(/\bspace/, ' '); //Acount for &lt; and &gt; escaping.
