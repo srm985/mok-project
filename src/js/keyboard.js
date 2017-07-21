@@ -124,8 +124,6 @@ $.fn.keyboard = function(options) {
                     inputAttributes[i] = tempElement.prop(i) === undefined ? '' : tempElement.prop(i);
                 });
 
-                console.log(inputAttributes);
-
                 if (!inputAttributes.disabled && !inputAttributes.readonly) {
                     focusedInputField = clickedElement;
                     inputFieldType = focusedInputField.prop('type');
@@ -542,8 +540,12 @@ $.fn.keyboard = function(options) {
         var deadkeyLookup = ('0000' + keyPressed.charCodeAt(0).toString(16)).slice(-4),
             caretPosition;
 
-        caretPosition = keyboardStreamField[0].selectionStart;
-
+        if (keyboardStreamField.prop('contenteditable') != 'true') {
+            caretPosition = keyboardStreamField[0].selectionStart;
+        } else {
+            console.log('error');
+        }
+        
         keyPressed = keyPressed.replace('&lt;', '<').replace('&gt;', '>').replace(/\bspace/, ' '); //Acount for &lt; and &gt; escaping.
 
         if (keyPressed.length > 2) {
@@ -589,10 +591,10 @@ $.fn.keyboard = function(options) {
                     keyboardStreamField.val(keyboardStreamField.val().slice(0, caretPosition - 1) + keyboardStreamField.val().slice(caretPosition));
                     caretPosition -= 1;
                     keyboardStreamField.focus();
-                    try {
+                    if (keyboardStreamField.prop('contenteditable') != 'true') {
                         keyboardStreamField[0].selectionStart = caretPosition;
                         keyboardStreamField[0].selectionEnd = caretPosition;
-                    } catch (err) {
+                    } else {
                         console.log('error');
                     }
                     break;
@@ -679,10 +681,10 @@ $.fn.keyboard = function(options) {
         }
         //*****Return focus and update caret position.*****
         keyboardStreamField.focus();
-        try {
+        if (keyboardStreamField.prop('contenteditable') != 'true') {
             keyboardStreamField[0].selectionStart = caretPosition;
             keyboardStreamField[0].selectionEnd = caretPosition;
-        } catch (err) {
+        } else {
             console.log('error');
         }
         keyboardStreamField.blur();
