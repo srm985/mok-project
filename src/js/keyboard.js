@@ -115,9 +115,7 @@ $.fn.keyboard = function(options) {
         pageElement.on('click touch', options.inputType, function() {
             var clickedElement;
 
-            console.log($(this).is(keyboardStreamField));
-
-            if (!$(this).is(keyboardStreamField)) {
+            if (!$(this).is(keyboardStreamField) || options.directEnter) {
                 clickedElement = $(this);
 
                 //*****Let's capture a few attributes about our input field.*****
@@ -146,18 +144,9 @@ $.fn.keyboard = function(options) {
                             keyboardStreamField.prop('type', 'text');
                         }
                         $('.keyboard-blackout-background').show();
-                    } else if (options.directEnter && inputAttributes.type != 'text') {
+                    } else if (options.directEnter) {
                         keyboardStreamField = focusedInputField;
-                        keyboardStreamField.prop('type', 'text');
-                        clickedElement.on('blur', function(e) {
-                            console.log(e.relatedTarget === null);
-                            if (e.relatedTarget === null || e.relatedTarget.className.search('keyboard-element') < 0) {
-                                focusedInputField.prop('type', inputAttributes.type);
-                                console.log('changing');
-                            }
-                        });
                     }
-                    //************************************************
 
                     $('.keyboard-wrapper').show();
                     keyboardOpen = true;
@@ -169,7 +158,14 @@ $.fn.keyboard = function(options) {
         //*****Listen for keypresses.*****
         $(document).on('click touch', '.keyboard-key', function() {
             var keyRegistered = $(this).data('keyval');
+            if (options.directEnter && (inputAttributes.type != 'text' && inputAttributes.type != 'password' && inputAttributes.type != 'textarea')) {
+                keyboardStreamField.prop('type', 'text');
+            }
             handleKeypress(keyRegistered);
+            if (options.directEnter && (inputAttributes.type != 'text' && inputAttributes.type != 'password' && inputAttributes.type != 'textarea')) {
+                focusedInputField.prop('type', inputAttributes.type);
+            }
+
         });
 
         //*****Handle our keyboard close button.*****
@@ -593,8 +589,12 @@ $.fn.keyboard = function(options) {
                     keyboardStreamField.val(keyboardStreamField.val().slice(0, caretPosition - 1) + keyboardStreamField.val().slice(caretPosition));
                     caretPosition -= 1;
                     keyboardStreamField.focus();
-                    keyboardStreamField[0].selectionStart = caretPosition;
-                    keyboardStreamField[0].selectionEnd = caretPosition;
+                    try {
+                        keyboardStreamField[0].selectionStart = caretPosition;
+                        keyboardStreamField[0].selectionEnd = caretPosition;
+                    } catch (err) {
+                        console.log('error');
+                    }
                     break;
                 case 'space':
                     //We insert a space character within the string each time the space bar is pressed.
@@ -675,12 +675,18 @@ $.fn.keyboard = function(options) {
             }
             //*****************************************************************************************************************************************
 
-            //*****Return focus and update caret position.*****
             caretPosition += keyPressed.length;
-            keyboardStreamField.focus();
+        }
+        //*****Return focus and update caret position.*****
+        keyboardStreamField.focus();
+        try {
             keyboardStreamField[0].selectionStart = caretPosition;
             keyboardStreamField[0].selectionEnd = caretPosition;
+        } catch (err) {
+            console.log('error');
         }
+        keyboardStreamField.blur();
+        keyboardStreamField.focus();
     }
 
     //***********************************************************************************
