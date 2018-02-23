@@ -256,7 +256,7 @@ This project is licensed under the MIT License - see the [LICENSE](https://githu
 
 In this release I have addressed several issues related to how the keyboard handles various input types. Beyond that, I have implemented regular expressions to handle input attribute validations. The keyboard also now respects the attributes 'disabled' and 'readonly'. Added the object inputAttributes to collect and organize these attributes.
 
-#### Version 1.11
+#### Version 1.1.1
 
 * Revised build scripts from Grunt to Gulp.
 * Cleaned up code base.
