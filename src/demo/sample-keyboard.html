@@ -3,23 +3,22 @@
 
 <head>
     <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
-    <script type="text/javascript" src="/src/js/keyboard.js"></script>
-    <link rel="stylesheet" type="text/css" href="/src/css/keyboard.css">
+    <script type="text/javascript" src="main.js"></script>
+    <link rel="stylesheet" type="text/css" href="styles.css">
     <script type="text/javascript">
-    $(document).ready(function() {
-        $(document).keyboard({
-            language: 'us, arabic, vietnamese, hindi',
-            enterKey: function() {
-                alert('Hey there! This is a callback function example.');
-            },
-            keyboardPosition: 'bottom',
-            directEnter: false
+        $(document).ready(function () {
+            $(document).keyboard({
+                language: 'us, arabic, vietnamese, hindi',
+                enterKey: function () {
+                    alert('Hey there! This is a callback function example.');
+                },
+                keyboardPosition: 'bottom',
+                directEnter: false
+            });
         });
-    });
     </script>
     <title>MOK Project - Sample</title>
-    <link rel="icon" href="favicon.ico">
-</head>
+    <link rel="icon" href="favicon.ico"> </head>
 
 <body>
     <label>Login:</label>
@@ -61,7 +60,6 @@
     <br>
     <br>
     <textarea>Text areas will be parsed into the keyboard input field as inputs, type=text.</textarea>
-    <br>
-</body>
+    <br> </body>
 
 </html>

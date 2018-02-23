@@ -1,75 +1,95 @@
+/***************************Variables***************************/
+$success-color: #2ecc71;
+$danger-color: #e74c3c;
+$dark-gray: #555;
+$medium-gray: #bdbdbd;
+$light-gray: #e0e0e0;
+$white-color: #fff;
+$capslock-light: #3498db;
+$blackout-color: rgba(25, 25, 25, 0.9);
+/***************************************************************/
+
+
 .keyboard-blackout-background {
     position: fixed;
     z-index: 9998;
     top: 0;
     left: 0;
+
     width: 100%;
     height: 100%;
-    background-color: rgba(25, 25, 25, 0.9);
+
+    background-color: $blackout-color;
 }
 
 .keyboard-wrapper {
     font-family: 'Verdana', sans-serif;
     font-size: 18px;
     line-height: 18px;
+
     position: fixed;
     z-index: 9999;
+
     width: calc(100% - 40px);
     min-width: 1004px;
     max-width: 1100px;
-    color: #555555;
-}
 
-.keyboard-wrapper .keyboard-action-wrapper {
-    display: -webkit-box;
-    display: flex;
-    width: 100%;
-    -webkit-box-pack: justify;
-    justify-content: space-between;
-}
+    color: $dark-gray;
+    .keyboard-action-wrapper {
+        display: -webkit-box;
+        display: flex;
+        -webkit-box-pack: justify;
+        justify-content: space-between;
 
-.keyboard-wrapper .keyboard-action-button {
-    font-family: inherit;
-    font-size: inherit;
-    display: inline;
-    width: 15%;
-    height: 40px;
-    margin: 0 5px;
-    padding: 0;
-    cursor: pointer;
-    color: #FFFFFF;
-    border: none;
-    border-radius: 4px;
-    outline: none;
-}
+        width: 100%;
+    }
+    .keyboard-action-button {
+        font-family: inherit;
+        font-size: inherit;
 
-.keyboard-wrapper .keyboard-cancel-button {
-    background-color: #E74C3C;
-}
+        display: inline;
 
-.keyboard-wrapper .keyboard-accept-button {
-    background-color: #2ECC71;
-}
+        width: 15%;
+        height: 40px;
+        margin: 0 5px;
+        padding: 0;
 
-.keyboard-wrapper .keyboard-input-field {
-    font-family: inherit;
-    font-size: inherit;
-    line-height: inherit;
-    box-sizing: content-box;
-    width: 60%;
-    height: 36px;
-    padding-right: 10px;
-    padding-left: 10px;
-    color: inherit;
-    border: solid 1px #555555;
-    border-radius: 4px;
-    outline: none;
+        cursor: pointer;
+
+        color: $white-color;
+        border: none;
+        border-radius: 4px;
+        outline: none;
+    }
+    .keyboard-cancel-button {
+        background-color: $danger-color;
+    }
+    .keyboard-accept-button {
+        background-color: $success-color;
+    }
+    .keyboard-input-field {
+        font-family: inherit;
+        font-size: inherit;
+        line-height: inherit;
+
+        box-sizing: content-box;
+        width: 60%;
+        height: 36px;
+        padding-right: 10px;
+        padding-left: 10px;
+
+        color: inherit;
+        border: solid 1px $dark-gray;
+        border-radius: 4px;
+        outline: none;
+    }
 }
 
 .keyboard-row {
     font-family: inherit;
     font-size: inherit;
     line-height: inherit;
+
     width: 100%;
     height: 50px;
     margin: 20px 0;
@@ -79,40 +99,47 @@
     font-family: inherit;
     font-size: inherit;
     line-height: inherit;
+
     display: inline;
+
     height: 100%;
     margin: 0 5px;
     padding: 0;
+
     cursor: pointer;
     vertical-align: middle;
+
     color: inherit;
     border: none;
     border-radius: 4px;
     outline: none;
-    background-color: #E0E0E0;
-}
-
-.keyboard-key:focus {
-    outline: none;
+    background-color: $light-gray;
+    &:focus {
+        outline: none;
+    }
 }
 
 .caps-lock-key {
     position: relative;
+    &::before {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+
+        width: 7px;
+        height: 7px;
+
+        content: '';
+        transition: background-color 0.05s ease-in-out;
+
+        border: solid 1px $medium-gray;
+        border-radius: 50%;
+        background-color: transparent;
+    }
 }
 
-.caps-lock-key:before {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    width: 7px;
-    height: 7px;
-    content: '';
-    transition: background-color 0.05s ease-in-out;
-    border: solid 1px #BDBDBD;
-    border-radius: 50%;
-    background-color: transparent;
-}
-
-.caps-lock-key-active:before {
-    background-color: #3498DB;
+.caps-lock-key-active {
+    &::before {
+        background-color: $capslock-light;
+    }
 }
