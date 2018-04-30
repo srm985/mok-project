@@ -57,7 +57,7 @@ $.fn.keyboard = function (options) {
         allowEnterAccept: typeof (options.allowEnterAccept) === 'undefined' ? true : options.allowEnterAccept,
         directEnter: typeof (options.directEnter) === 'undefined' ? false : options.directEnter,
         keyCharacterRegex: typeof (options.keyCharacterRegex) === 'undefined' ? { number: /[0-9]|[eE]|\.|\+|-/, tel: /[0-9]|\.|\+|-|#|\(|\)/ } : options.keyCharacterRegex,
-        inputFieldRegex: typeof (options.inputFieldRegex) === 'undefined' ? { number: /^(-)?(((\d+)|(\d+\.(\d+)?)|(\.(\d+)?))([eE]([-+])?(\d+)?)?)?$/ } : options.inputFieldRegex,
+        inputFieldRegex: typeof (options.inputFieldRegex) === 'undefined' ? { number: /^(-)?(((\d+)|(\d+\.(\d+)?)|(\.(\d+)?))([eE]([-+])?(\d+)?)?)?$/ } : options.inputFieldRegex
     };
 
     //*****Define our attributes that we care about.*****
@@ -653,11 +653,24 @@ $.fn.keyboard = function (options) {
             }
             //*****************************************************************************************************************************************
 
-            //*****Return focus and update caret position.*****
+            /**
+             * Here we return focus and update the caret postion. We
+             * assume that if we throw an error that something invalid
+             * happened so we'll just revert back to the original text.
+             */
             caretPosition += keyPressed.length;
             keyboardStreamField.focus();
-            keyboardStreamField[0].selectionStart = caretPosition;
-            keyboardStreamField[0].selectionEnd = caretPosition;
+            try {
+                keyboardStreamField[0].selectionStart = caretPosition;
+                keyboardStreamField[0].selectionEnd = caretPosition;
+            } catch (err) {
+                console.log(err)
+                console.log(tempString)
+                console.log(keyboardStreamField.val())
+                if (tempString.length && tempString !== keyboardStreamField.val()) {
+                    keyboardStreamField.val(tempString);
+                }
+            }
         }
     }
 
