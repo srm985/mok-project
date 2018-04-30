@@ -15,7 +15,7 @@
 
 $.fn.keyboard = function (options) {
 
-    var keyMap = { '29': 0, '02': 1, '03': 2, '04': 3, '05': 4, '06': 5, '07': 6, '08': 7, '09': 8, '0a': 9, '0b': 10, '0c': 11, '0d': 12, '10': 13, '11': 14, '12': 15, '13': 16, '14': 17, '15': 18, '16': 19, '17': 20, '18': 21, '19': 22, '1a': 23, '1b': 24, '2b': 25, '1e': 26, '1f': 27, '20': 28, '21': 29, '22': 30, '23': 31, '24': 32, '25': 33, '26': 34, '27': 35, '28': 36, '2c': 37, '2d': 38, '2e': 39, '2f': 40, '30': 41, '31': 42, '32': 43, '33': 44, '34': 45, '35': 46 },
+    let keyMap = { '29': 0, '02': 1, '03': 2, '04': 3, '05': 4, '06': 5, '07': 6, '08': 7, '09': 8, '0a': 9, '0b': 10, '0c': 11, '0d': 12, '10': 13, '11': 14, '12': 15, '13': 16, '14': 17, '15': 18, '16': 19, '17': 20, '18': 21, '19': 22, '1a': 23, '1b': 24, '2b': 25, '1e': 26, '1f': 27, '20': 28, '21': 29, '22': 30, '23': 31, '24': 32, '25': 33, '26': 34, '27': 35, '28': 36, '2c': 37, '2d': 38, '2e': 39, '2f': 40, '30': 41, '31': 42, '32': 43, '33': 44, '34': 45, '35': 46 },
         keyStatusObject = { shift: false, caps: false, altgrp: false, shift_altgrp: '' },
         pageElement = $(this),
         focusedInputField,
@@ -61,7 +61,7 @@ $.fn.keyboard = function (options) {
     };
 
     //*****Define our attributes that we care about.*****
-    var inputAttributes = {
+    let inputAttributes = {
         disabled: '',
         readonly: '',
         maxlength: '',
@@ -81,7 +81,7 @@ $.fn.keyboard = function (options) {
     //*             Return our selected input types as a formatted string.              *
     //***********************************************************************************
     function setInputType(inputType) {
-        var inputTypeArray = new Array(),
+        let inputTypeArray = new Array(),
             formattedString = '';
 
         if (inputType !== undefined && inputType != '') {
@@ -115,7 +115,7 @@ $.fn.keyboard = function (options) {
             if ($(this).prop('class') != 'keyboard-input-field') {
 
                 //*****Let's capture a few attributes about our input field.*****
-                var tempElement = $(this);
+                let tempElement = $(this);
                 $.each(inputAttributes, function (i) {
                     inputAttributes[i] = tempElement.prop(i) === undefined ? '' : tempElement.prop(i);
                 });
@@ -153,7 +153,7 @@ $.fn.keyboard = function (options) {
 
         //*****Listen for keypresses.*****
         $(document).on('click touch', '.keyboard-key', function () {
-            var keyRegistered = $(this).data('keyval');
+            let keyRegistered = $(this).data('keyval');
             handleKeypress(keyRegistered);
         });
 
@@ -171,7 +171,7 @@ $.fn.keyboard = function (options) {
         $(document).on('click touch', '*', function (e) {
             e.stopPropagation();
             if (keyboardOpen && options.directEnter) {
-                var elementLayer = $(this);
+                let elementLayer = $(this);
                 if (options.inputType.search(elementLayer.attr('type')) < 1 && options.inputType.search(elementLayer.prop('tagName').toLowerCase()) < 1 && elementLayer.prop('contenteditable') != 'true') {
                     while (elementLayer.parent().length && !elementLayer.hasClass('keyboard-wrapper')) {
                         elementLayer = elementLayer.parent();
@@ -233,7 +233,7 @@ $.fn.keyboard = function (options) {
     //*                      Parse information from keyboard file.                      *
     //***********************************************************************************
     function parseKeyboardFile(file, data) {
-        var keyData,
+        let keyData,
             shiftStateData,
             shiftStateLocation = '',
             deadkeyData,
@@ -327,7 +327,7 @@ $.fn.keyboard = function (options) {
     //*            This function handles the main buildout of our keyboard.             *
     //***********************************************************************************
     function materializeKeyboard(keyListString) {
-        var keyList = keyListString.toString().split(','),
+        let keyList = keyListString.toString().split(','),
             keyObject = new Array(),
             keyMapArray = new Array(47);
 
@@ -381,7 +381,7 @@ $.fn.keyboard = function (options) {
     //*                    Create row wrapper and fill with keys.                       *
     //***********************************************************************************
     function generateRow(keyListSplit) {
-        var keyObject;
+        let keyObject;
 
         $('.keyboard-wrapper').append('<div class="keyboard-row"></div>');
         $.each(keyListSplit, function (i, value) {
@@ -398,7 +398,7 @@ $.fn.keyboard = function (options) {
     //*                 Sort out deadkeys, ligature, and undefined.                     *
     //***********************************************************************************
     function determineKey(keyValue, VK) {
-        var returnKey = keyValue;
+        let returnKey = keyValue;
 
         if (keyValue == '%%') {
             returnKey = ligatureObject[VK];
@@ -436,7 +436,7 @@ $.fn.keyboard = function (options) {
     //*              Adjust sizing of keys based on our enabled options.                *
     //***********************************************************************************
     function sizeKeys() {
-        var rowWidth = $('.keyboard-row').width(),
+        let rowWidth = $('.keyboard-row').width(),
             maxKeyCount = 15,
             keyPadding = 2 * ($('.keyboard-key').css('margin-right')).match(/[0-9]/),
             smallKeys,
@@ -461,7 +461,7 @@ $.fn.keyboard = function (options) {
     //*                Cycle key values based on depressed function keys.               *
     //***********************************************************************************
     function setKeys(keyType) {
-        var currentKey,
+        let currentKey,
             keyObject,
             tempString = '';
 
@@ -523,7 +523,7 @@ $.fn.keyboard = function (options) {
     //***********************************************************************************
     function handleKeypress(keyPressed) {
         //*****Convert deadkey to hex and pad with zeros to ensure it's four digits.*****
-        var deadkeyLookup = ('0000' + keyPressed.charCodeAt(0).toString(16)).slice(-4),
+        let deadkeyLookup = ('0000' + keyPressed.charCodeAt(0).toString(16)).slice(-4),
             caretPosition = keyboardStreamField[0].selectionStart;
 
         keyPressed = keyPressed.replace('&lt;', '<').replace('&gt;', '>').replace(/\bspace/, ' '); //Acount for &lt; and &gt; escaping.
@@ -629,7 +629,7 @@ $.fn.keyboard = function (options) {
             if (deadkeyPressed || deadkeySet) {
                 keyPressed = '';
                 if (deadkeyPressed === undefined && deadkeySet) {
-                    var combinedKey = String.fromCharCode('0x' + deadkeySet[deadkeyLookup]);
+                    let combinedKey = String.fromCharCode('0x' + deadkeySet[deadkeyLookup]);
                     if (combinedKey && deadkeySet[deadkeyLookup] !== undefined) {
                         keyPressed = combinedKey;
                     }
@@ -640,7 +640,7 @@ $.fn.keyboard = function (options) {
             //*****Write key value and update input attributes.*****
             keyboardStreamField.attr('dir', textFlowDirection);
             //*****Store before and after copies in case we need to revert.*****
-            var tempString = keyboardStreamField.val(),
+            let tempString = keyboardStreamField.val(),
                 newString;
 
             keyboardStreamField.val(keyboardStreamField.val().slice(0, caretPosition) + keyPressed + keyboardStreamField.val().slice(caretPosition));
@@ -690,7 +690,7 @@ $.fn.keyboard = function (options) {
     //*                Provide some styling options for our keyboard.                   *
     //***********************************************************************************
     function keyboardAttributes() {
-        var viewportWidth = $(window).width(),
+        let viewportWidth = $(window).width(),
             viewportHeight = $(window).height(),
             keyboardHeight = $('.keyboard-wrapper').height(),
             keyboardWidth = $('.keyboard-wrapper').width();
@@ -738,7 +738,7 @@ $.fn.keyboard = function (options) {
     //*                  Reset all of our keyboard function keys.                       *
     //***********************************************************************************
     function clearKeyboardState() {
-        for (var property in keyStatusObject) {
+        for (let property in keyStatusObject) {
             if (keyStatusObject.hasOwnProperty(property)) {
                 keyStatusObject[property] = false;
             }
