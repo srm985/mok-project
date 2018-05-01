@@ -343,7 +343,7 @@ $.fn.keyboard = function (options) {
             destroyKeys();
             keyboardWrapperPresent = true;
         } else {
-            $('body').prepend('<div class="keyboard-wrapper"></div>');
+            $('body').prepend(`<div class="keyboard-wrapper ${options.directEnter ? 'condensed-layout' : ''}"></div>`);
             //*****If direct enter enabled, don't bother.*****
             if (!options.directEnter) {
                 $('body').prepend('<div class="keyboard-blackout-background"></div>');
@@ -665,11 +665,6 @@ $.fn.keyboard = function (options) {
                 keyboardStreamField[0].selectionEnd = caretPosition;
             } catch (err) {
                 console.log(err)
-                console.log(tempString)
-                console.log(keyboardStreamField.val())
-                if (tempString.length && tempString !== keyboardStreamField.val()) {
-                    keyboardStreamField.val(tempString);
-                }
             }
         }
     }

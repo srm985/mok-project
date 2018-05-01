@@ -83,6 +83,12 @@ $blackout-color: rgba(25, 25, 25, 0.9);
         border-radius: 4px;
         outline: none;
     }
+    &.condensed-layout {
+        /* background-color: red !important; */
+        .keyboard-row {
+            margin: 10px 0;
+        }
+    }
 }
 
 .keyboard-row {

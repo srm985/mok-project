@@ -63,7 +63,7 @@ gulp.task('build-css', () => {
         .pipe(cssnano())
         .pipe(gulpif(arg.sourcemap, sourcemaps.write()))
         .pipe(gulp.dest('dist/'))
-        .pipe(browserSync.stream({ match: '**/*.css' }));
+        .pipe(browserSync.stream());
 });
 
 gulp.task('build-js', () => {
@@ -81,7 +81,7 @@ gulp.task('build-js', () => {
 gulp.task('serve', () => {
     browserSync.init({
         server: {
-            baseDir: './dist/',
+            baseDir: './dist',
             index: 'index.html'
         },
         reloadDelay: 50,
@@ -93,5 +93,5 @@ gulp.task('serve', () => {
     });
 });
 
-gulp.task('develop', gulpSequence('clean', ['copy', 'copy-demo', 'build-css', 'build-js', 'serve']));
+gulp.task('develop', gulpSequence('clean', ['copy', 'copy-demo', 'build-css', 'build-js'], 'serve'));
 gulp.task('build', gulpSequence('clean', ['copy', 'build-css', 'build-js']));
