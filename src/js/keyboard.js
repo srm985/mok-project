@@ -56,6 +56,7 @@ $.fn.keyboard = function (passedOptions) {
         keyboardPosition = 'bottom',
         language = 'us',
         languageKey = '',
+        languageKeyTextColor = '#3498db',
         showSelectedLanguage = false,
         spareKey = '',
         tabKey = ''
@@ -80,6 +81,7 @@ $.fn.keyboard = function (passedOptions) {
         keyTextColor,
         language,
         languageKey,
+        languageKeyTextColor,
         showSelectedLanguage,
         spareKey,
         tabKey
@@ -441,6 +443,7 @@ $.fn.keyboard = function (passedOptions) {
     function keyboardFillout() {
         const {
             language,
+            languageKeyTextColor,
             showSelectedLanguage
         } = options;
 
@@ -459,7 +462,9 @@ $.fn.keyboard = function (passedOptions) {
         $('.keyboard-row:eq(3)').append('<button class="keyboard-key keyboard-key-lg" data-keyval="shift">Shift</button>');
         $('.keyboard-wrapper').append('<div class="keyboard-row"></div>');
         $('.keyboard-row:eq(4)').append('<button class="keyboard-key keyboard-key-lg" data-keyval="ctrl">Ctrl</button>');
-        $('.keyboard-row:eq(4)').append(`<button class="keyboard-key keyboard-key-lg language-button" data-keyval="language"><span data-keyval="language">${languageButtonText}</span></button>`);
+        $('.keyboard-row:eq(4)').append(`<button class="keyboard-key keyboard-key-lg language-button" data-keyval="language">
+        <span style="color: ${languageKeyTextColor};" data-keyval="language">${languageButtonText}</span>
+        </button>`);
         $('.keyboard-row:eq(4)').append('<button class="keyboard-key keyboard-key-lg" data-keyval="alt">Alt</button>');
         $('.keyboard-row:eq(4)').append('<button class="keyboard-key keyboard-key-xl" data-keyval="space">&nbsp;</button>');
         $('.keyboard-row:eq(4)').append('<button class="keyboard-key keyboard-key-lg" data-keyval="alt grp">Alt Grp</button>');

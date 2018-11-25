@@ -63,20 +63,21 @@ To initiate an instance of the keyboard within your application you may include 
 
 | Option | Default Value | Information |
 |--------|---------------|-------------|
-| inputType | 'text, textarea, number, password, search, tel, url, contenteditable' | May pass individual input types or comma-separated values. |
-| language | none | Given as a string with comma-separated values i.e. 'us, spanish, arabic, russian'. |
-| keyboardPosition | 'bottom' | Locate the keyboard at page 'top', 'middle', or 'bottom' with a default edge padding of 20px. |
-| cancelColor | '#E74C3C' | Defines background color of cancel button. May pass hex string or specific color i.e. 'blue'. |
-| cancelTextColor | '#FFFFFF' | Defines text color of cancel button. May pass hex string or specific color i.e. 'white'. |
 | acceptColor | '#2ECC71' | Defines background color of accept button. May pass hex string or specific color i.e. 'blue'. |
 | acceptTextColor | '#FFFFFF' | Defines text color of accept button. May pass hex string or specific color i.e. 'white'. |
+| allowEnterAccept | true | Accept keyboard input with hardware keyboard [Enter] key. |
+| allowEscapeCancel | true | Cancel keyboard input with hardware keyboard [Escape] key. |
+| blackoutColor | '25, 25, 25, 0.9' | Defines color and opacity of blackout background. Passed as RGBA string. |
+| cancelColor | '#E74C3C' | Defines background color of cancel button. May pass hex string or specific color i.e. 'blue'. |
+| cancelTextColor | '#FFFFFF' | Defines text color of cancel button. May pass hex string or specific color i.e. 'white'. |
+| inputFieldRegex | { number: /^(-)?(((&#92;d+)&#124;(&#92;d+&#92;.(&#92;d+)?)&#124;(&#92;.(&#92;d+)?))([eE]([-+])?(&#92;d+)?)?)?$/ } | Define regular expressions for the accepted patterns of input field types. These patterns serve to further restrict browser-specific prepopulated patterns. For example, you may NOT generate a regex to allow letters in an input[type="number"]. Ensure these are whole pattern matches handled by the prepension and appension of ^ and $. The object keys must match identically to the input type. |
+| inputType | 'text, textarea, number, password, search, tel, url, contenteditable' | May pass individual input types or comma-separated values. |
+| keyCharacterRegex | { number: /[0-9]&#124;[eE]&#124;&#92;.&#124;&#92;+&#124;&#92;-/, tel: /[0-9]&#124;&#92;.&#124;&#92;+&#124;&#92;-&#124;&#92;#&#124;&#92;(&#124;&#92;)/ } | Define regular expressions for input field types. These pertain to the individual key pressed, not the whole accepted pattern. The object keys must match identically to the input type. |
 | keyColor | '#E0E0E0' | Defines background color of keys. May pass hex string or specific color i.e. 'blue'. |
 | keyTextColor | '#555555' | Defines text color used on keys. May pass hex string or specific color i.e. 'blue'. |
-| blackoutColor | '25, 25, 25, 0.9' | Defines color and opacity of blackout background. Passed as RGBA string. |
-| allowEscapeCancel | true | Cancel keyboard input with hardware keyboard [Escape] key. |
-| allowEnterAccept | true | Accept keyboard input with hardware keyboard [Enter] key. |
-| keyCharacterRegex | { number: /[0-9]&#124;[eE]&#124;&#92;.&#124;&#92;+&#124;&#92;-/, tel: /[0-9]&#124;&#92;.&#124;&#92;+&#124;&#92;-&#124;&#92;#&#124;&#92;(&#124;&#92;)/ } | Define regular expressions for input field types. These pertain to the individual key pressed, not the whole accepted pattern. The object keys must match identically to the input type. |
-| inputFieldRegex | { number: /^(-)?(((&#92;d+)&#124;(&#92;d+&#92;.(&#92;d+)?)&#124;(&#92;.(&#92;d+)?))([eE]([-+])?(&#92;d+)?)?)?$/ } | Define regular expressions for the accepted patterns of input field types. These patterns serve to further restrict browser-specific prepopulated patterns. For example, you may NOT generate a regex to allow letters in an input[type="number"]. Ensure these are whole pattern matches handled by the prepension and appension of ^ and $. The object keys must match identically to the input type. |
+| keyboardPosition | 'bottom' | Locate the keyboard at page 'top', 'middle', or 'bottom' with a default edge padding of 20px. |
+| language | none | Given as a string with comma-separated values i.e. 'us, spanish, arabic, russian'. |
+| languageKeyTextColor | #3498db | Defines text color of language button. May pass hex string or specific color i.e. 'white'. |
 | showSelectedLanguage | false | This option labels the language button with the currently-selected language. The name is derived from the actual language file name, so name appropriately. |
 
 
@@ -84,12 +85,12 @@ To initiate an instance of the keyboard within your application you may include 
 
 | Name | Information |
 |------|-------------|
-| enterKey | Define action of [Enter] key |
-| tabKey | Define action of [Tab] key |
-| ctrlKey | Define action of [Ctrl] key |
 | altKey | Define action of [Alt] key |
-| spareKey | Define action of [Spare] key |
+| ctrlKey | Define action of [Ctrl] key |
+| enterKey | Define action of [Enter] key |
 | languageKey | Define action of [Language] key |
+| spareKey | Define action of [Spare] key |
+| tabKey | Define action of [Tab] key |
 
 _You may change the user-displayed names of any keys in keyboard.js without affecting functionality._
 
