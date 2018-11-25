@@ -1,6 +1,6 @@
 {
   "name": "mok-project",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "A jQuery plugin providing multilingual onscreen keyboard for terminals and kiosks.",
   "main": "index.js",
   "scripts": {

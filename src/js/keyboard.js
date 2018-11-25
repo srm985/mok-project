@@ -7,13 +7,13 @@
 //*            GitHub: https://github.com/srm985/mok-project                        *
 //*                                                                                 *
 //*            Started: March 2017                                                  *
-//*            Version: 1.0                                                         *
+//*            Version: 1.1.2                                                         *
 //*                                                                                 *
 //*            License: MIT (https://opensource.org/licenses/MIT)                   *
 //*                                                                                 *
 //***********************************************************************************
 
-$.fn.keyboard = function (options) {
+$.fn.keyboard = function (passedOptions) {
 
     var keyMap = { '29': 0, '02': 1, '03': 2, '04': 3, '05': 4, '06': 5, '07': 6, '08': 7, '09': 8, '0a': 9, '0b': 10, '0c': 11, '0d': 12, '10': 13, '11': 14, '12': 15, '13': 16, '14': 17, '15': 18, '16': 19, '17': 20, '18': 21, '19': 22, '1a': 23, '1b': 24, '2b': 25, '1e': 26, '1f': 27, '20': 28, '21': 29, '22': 30, '23': 31, '24': 32, '25': 33, '26': 34, '27': 35, '28': 36, '2c': 37, '2d': 38, '2e': 39, '2f': 40, '30': 41, '31': 42, '32': 43, '33': 44, '34': 45, '35': 46 },
         keyStatusObject = { shift: false, caps: false, altgrp: false, shift_altgrp: '' },
@@ -34,31 +34,58 @@ $.fn.keyboard = function (options) {
         keyboardInputType = 'text',
         keyboardStreamField;
 
-    //*****Find all of our default options defined here.*****
-    options = {
-        language: typeof (options.language) === 'undefined' ? 'us' : options.language,
-        keyColor: typeof (options.keyColor) === 'undefined' ? '#E0E0E0' : options.keyColor,
-        keyTextColor: typeof (options.keyTextColor) === 'undefined' ? '#555555' : options.keyTextColor,
-        capsLightColor: typeof (options.capsLightColor) === 'undefined' ? '#3498DB' : options.capsLightColor,
-        enterKey: typeof (options.enterKey) === 'undefined' ? '' : options.enterKey,
-        tabKey: typeof (options.tabKey) === 'undefined' ? '' : options.tabKey,
-        ctrlKey: typeof (options.ctrlKey) === 'undefined' ? '' : options.ctrlKey,
-        altKey: typeof (options.altKey) === 'undefined' ? '' : options.altKey,
-        spareKey: typeof (options.spareKey) === 'undefined' ? '' : options.spareKey,
-        languageKey: typeof (options.languageKey) === 'undefined' ? '' : options.languageKey,
-        keyboardPosition: typeof (options.keyboardPosition) === 'undefined' ? 'bottom' : options.keyboardPosition,
-        inputType: setInputType(options.inputType),
-        cancelColor: typeof (options.cancelColor) === 'undefined' ? '#E74C3C' : options.cancelColor,
-        cancelTextColor: typeof (options.cancelTextColor) === 'undefined' ? '#FFFFFF' : options.cancelTextColor,
-        acceptColor: typeof (options.acceptColor) === 'undefined' ? '#2ECC71' : options.acceptColor,
-        acceptTextColor: typeof (options.acceptTextColor) === 'undefined' ? '#FFFFFF' : options.acceptTextColor,
-        blackoutColor: typeof (options.blackoutColor) === 'undefined' ? '25, 25, 25, 0.9' : options.blackoutColor,
-        allowEscapeCancel: typeof (options.allowEscapeCancel) === 'undefined' ? true : options.allowEscapeCancel,
-        allowEnterAccept: typeof (options.allowEnterAccept) === 'undefined' ? true : options.allowEnterAccept,
-        directEnter: typeof (options.directEnter) === 'undefined' ? false : options.directEnter,
-        keyCharacterRegex: typeof (options.keyCharacterRegex) === 'undefined' ? { number: /[0-9]|[eE]|\.|\+|-/, tel: /[0-9]|\.|\+|-|#|\(|\)/ } : options.keyCharacterRegex,
-        inputFieldRegex: typeof (options.inputFieldRegex) === 'undefined' ? { number: /^(-)?(((\d+)|(\d+\.(\d+)?)|(\.(\d+)?))([eE]([-+])?(\d+)?)?)?$/ } : options.inputFieldRegex,
-    };
+    // Define our default options.
+    const initOptions = ({
+        acceptColor = '#2ECC71',
+        acceptTextColor = '#FFFFFF',
+        allowEnterAccept = true,
+        allowEscapeCancel = true,
+        altKey = '',
+        blackoutColor = '25, 25, 25, 0.9',
+        cancelColor = '#E74C3C',
+        cancelTextColor = '#FFFFFF',
+        capsLightColor = '#3498DB',
+        ctrlKey = '',
+        directEnter = false,
+        enterKey = '',
+        inputFieldRegex = { number: /^(-)?(((\d+)|(\d+\.(\d+)?)|(\.(\d+)?))([eE]([-+])?(\d+)?)?)?$/ },
+        inputType = '',
+        keyCharacterRegex = { number: /[0-9]|[eE]|\.|\+|-/, tel: /[0-9]|\.|\+|-|#|\(|\)/ },
+        keyColor = '#E0E0E0',
+        keyTextColor = '#555555',
+        keyboardPosition = 'bottom',
+        language = 'us',
+        languageKey = '',
+        showSelectedLanguage = false,
+        spareKey = '',
+        tabKey = ''
+    }) => ({
+        acceptColor,
+        acceptTextColor,
+        allowEnterAccept,
+        allowEscapeCancel,
+        altKey,
+        blackoutColor,
+        cancelColor,
+        cancelTextColor,
+        capsLightColor,
+        ctrlKey,
+        directEnter,
+        enterKey,
+        inputFieldRegex,
+        inputType: setInputType(inputType),
+        keyboardPosition,
+        keyCharacterRegex,
+        keyColor,
+        keyTextColor,
+        language,
+        languageKey,
+        showSelectedLanguage,
+        spareKey,
+        tabKey
+    });
+
+    const options = initOptions(passedOptions);
 
     //*****Define our attributes that we care about.*****
     var inputAttributes = {
@@ -68,7 +95,6 @@ $.fn.keyboard = function (options) {
         min: '',
         max: '',
         placeholder: ''
-
     };
 
     //*****Quick cleanup of our language array.*****
@@ -152,7 +178,7 @@ $.fn.keyboard = function (options) {
         });
 
         //*****Listen for keypresses.*****
-        $(document).on('click touch', '.keyboard-key', function () {
+        $('body').on('click touch', '.keyboard-key', function () {
             var keyRegistered = $(this).data('keyval');
             handleKeypress(keyRegistered);
         });
@@ -413,6 +439,15 @@ $.fn.keyboard = function (options) {
     //*      Append our extra function keys that we didn't get from the .klc file.      *
     //***********************************************************************************
     function keyboardFillout() {
+        const {
+            language,
+            showSelectedLanguage
+        } = options;
+
+        const prettifiedLanguage = ((language[languageArrayPosition]).toLowerCase()).replace(/^\w/, c => c.toUpperCase());
+
+        const languageButtonText = showSelectedLanguage ? prettifiedLanguage : 'Language';
+
         if (!$('.keyboard-action-wrapper').length && !options.directEnter) {
             $('.keyboard-wrapper').prepend('<div class="keyboard-action-wrapper"><button class="keyboard-action-button keyboard-cancel-button">Cancel</button><input type="text" class="keyboard-input-field"><button class="keyboard-action-button keyboard-accept-button">Accept</button></div>');
         }
@@ -424,7 +459,7 @@ $.fn.keyboard = function (options) {
         $('.keyboard-row:eq(3)').append('<button class="keyboard-key keyboard-key-lg" data-keyval="shift">Shift</button>');
         $('.keyboard-wrapper').append('<div class="keyboard-row"></div>');
         $('.keyboard-row:eq(4)').append('<button class="keyboard-key keyboard-key-lg" data-keyval="ctrl">Ctrl</button>');
-        $('.keyboard-row:eq(4)').append('<button class="keyboard-key keyboard-key-lg" data-keyval="language">Language</button>');
+        $('.keyboard-row:eq(4)').append(`<button class="keyboard-key keyboard-key-lg language-button" data-keyval="language"><span data-keyval="language">${languageButtonText}</span></button>`);
         $('.keyboard-row:eq(4)').append('<button class="keyboard-key keyboard-key-lg" data-keyval="alt">Alt</button>');
         $('.keyboard-row:eq(4)').append('<button class="keyboard-key keyboard-key-xl" data-keyval="space">&nbsp;</button>');
         $('.keyboard-row:eq(4)').append('<button class="keyboard-key keyboard-key-lg" data-keyval="alt grp">Alt Grp</button>');
@@ -451,9 +486,9 @@ $.fn.keyboard = function (options) {
             largeKeys = $(this).children('.keyboard-key-lg').length;
             xlargeKeys = $(this).children('.keyboard-key-xl').length;
             largeKeyWidth = (rowWidth - ((smallKeys + largeKeys + xlargeKeys) * keyPadding) - (smallKeys * smallKeyWidth) - (xlargeKeys * xlargeKeyWidth)) / largeKeys;
-            $(this).children('.keyboard-key-sm').width(smallKeyWidth);
-            $(this).children('.keyboard-key-lg').width(largeKeyWidth);
-            $(this).children('.keyboard-key-xl').width(xlargeKeyWidth);
+            $(this).children('.keyboard-key-sm').css('cssText', `width: ${smallKeyWidth}px`);
+            $(this).children('.keyboard-key-lg').css('cssText', `width: ${largeKeyWidth}px`);
+            $(this).children('.keyboard-key-xl').css('cssText', `width: ${xlargeKeyWidth}px`);
         });
     }
 
