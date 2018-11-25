@@ -261,3 +261,7 @@ In this release I have addressed several issues related to how the keyboard hand
 
 * Revised build scripts from Grunt to Gulp.
 * Cleaned up code base.
+
+#### Version 1.1.2
+
+* Added option to support showing the currently-displayed language.

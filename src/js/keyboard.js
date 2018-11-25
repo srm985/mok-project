@@ -7,7 +7,7 @@
 //*            GitHub: https://github.com/srm985/mok-project                        *
 //*                                                                                 *
 //*            Started: March 2017                                                  *
-//*            Version: 1.1.1                                                         *
+//*            Version: 1.1.2                                                         *
 //*                                                                                 *
 //*            License: MIT (https://opensource.org/licenses/MIT)                   *
 //*                                                                                 *
