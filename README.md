@@ -266,3 +266,7 @@ In this release I have addressed several issues related to how the keyboard hand
 #### Version 1.1.2
 
 * Added option to support showing the currently-displayed language.
+
+#### Version 1.1.3
+
+* Added ability to define language key text color.
