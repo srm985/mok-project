@@ -12,12 +12,9 @@ const gulp = require('gulp'),
     babel = require('gulp-babel'),
     uglify = require('gulp-uglify'),
     browserSync = require('browser-sync').create(),
-    gutil = require('gulp-util'),
     gulpif = require('gulp-if'),
     gulpSequence = require('gulp-sequence'),
     rename = require('gulp-rename');
-
-let env;
 
 const arg = (argList => {
     let arg = {},
@@ -72,7 +69,11 @@ gulp.task('build-js', () => {
         .pipe(concat('main.js'))
         .pipe(eslint({ fix: true }))
         .pipe(eslint.format())
-        .pipe(babel({ presets: ['es2015'] }))
+        .pipe(babel({
+            presets: [
+                '@babel/env'
+            ]
+        }))
         .pipe(uglify())
         .pipe(gulpif(arg.sourcemap, sourcemaps.write()))
         .pipe(gulp.dest('dist/'));
