@@ -77,6 +77,7 @@ To initiate an instance of the keyboard within your application you may include 
 | allowEnterAccept | true | Accept keyboard input with hardware keyboard [Enter] key. |
 | keyCharacterRegex | { number: /[0-9]&#124;[eE]&#124;&#92;.&#124;&#92;+&#124;&#92;-/, tel: /[0-9]&#124;&#92;.&#124;&#92;+&#124;&#92;-&#124;&#92;#&#124;&#92;(&#124;&#92;)/ } | Define regular expressions for input field types. These pertain to the individual key pressed, not the whole accepted pattern. The object keys must match identically to the input type. |
 | inputFieldRegex | { number: /^(-)?(((&#92;d+)&#124;(&#92;d+&#92;.(&#92;d+)?)&#124;(&#92;.(&#92;d+)?))([eE]([-+])?(&#92;d+)?)?)?$/ } | Define regular expressions for the accepted patterns of input field types. These patterns serve to further restrict browser-specific prepopulated patterns. For example, you may NOT generate a regex to allow letters in an input[type="number"]. Ensure these are whole pattern matches handled by the prepension and appension of ^ and $. The object keys must match identically to the input type. |
+| showSelectedLanguage | false | This option labels the language button with the currently-selected language. The name is derived from the actual language file name, so name appropriately. |
 
 
 #### Callbacks

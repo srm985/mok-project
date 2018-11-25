@@ -1,11 +1,12 @@
 /***************************Variables***************************/
+$primary-color: #3498db;
 $success-color: #2ecc71;
 $danger-color: #e74c3c;
 $dark-gray: #555;
 $medium-gray: #bdbdbd;
 $light-gray: #e0e0e0;
 $white-color: #fff;
-$capslock-light: #3498db;
+$capslock-light: $primary-color;
 $blackout-color: rgba(25, 25, 25, 0.9);
 /***************************************************************/
 
@@ -100,7 +101,7 @@ $blackout-color: rgba(25, 25, 25, 0.9);
     font-size: inherit;
     line-height: inherit;
 
-    display: inline;
+    display: inline-block;
 
     height: 100%;
     margin: 0 5px;
@@ -142,4 +143,15 @@ $blackout-color: rgba(25, 25, 25, 0.9);
     &::before {
         background-color: $capslock-light;
     }
+}
+
+.language-button {
+    overflow: hidden;
+
+    padding: 0 10px;
+
+    white-space: nowrap;
+    text-overflow: ellipsis;
+
+    color: $primary-color !important;
 }
