@@ -1,6 +1,6 @@
 {
   "name": "mok-project",
-  "version": "1.1.2",
+  "version": "1.1.4",
   "description": "A jQuery plugin providing multilingual onscreen keyboard for terminals and kiosks.",
   "main": "index.js",
   "scripts": {
@@ -11,12 +11,15 @@
     "url": "https://github.com/srm985/mok-project.git"
   },
   "keywords": [
-    "Keyboard",
-    "Virtual",
-    "On-Screen",
     "JavaScript",
-    "jQuery",
-    "Multilingual"
+    "Keyboard",
+    "Kiosk",
+    "Multilingual",
+    "On-Screen",
+    "Terminal",
+    "Touch",
+    "Virtual",
+    "jQuery"
   ],
   "author": "Sean McQuay (www.seanmcquay.com)",
   "license": "MIT",
