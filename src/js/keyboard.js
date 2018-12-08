@@ -20,7 +20,7 @@ $.fn.keyboard = function (passedOptions) {
         pageElement = $(this),
         focusedInputField,
         resizeTimerActive = false,
-        languageArrayPosition,
+        languageArrayPosition = 0,
         storedKeyboardObject = { keyboardFile: '', arrayPosition: '' },
         shiftStateObject,
         deadkeyObject,
@@ -33,6 +33,15 @@ $.fn.keyboard = function (passedOptions) {
         inputFieldType = 'text',
         keyboardInputType = 'text',
         keyboardStreamField;
+
+    const LANGUAGE_KEY_DEFAULT = 'Language';
+    const LANGUAGE_MAP_SPLIT_CHAR = ':';
+    const TRIGGER_KEYBOARD_FLAG = 'triggerKeyboard';
+
+    // Build out our language list from input string.
+    const constructLanguageList = (language) =>
+        language.split(',').map(splitLanguage =>
+            splitLanguage.trim());
 
     // Define our default options.
     const initOptions = ({
@@ -54,11 +63,12 @@ $.fn.keyboard = function (passedOptions) {
         keyColor = '#E0E0E0',
         keyTextColor = '#555555',
         keyboardPosition = 'bottom',
-        language = 'us',
+        language = '',
         languageKey = '',
         languageKeyTextColor = '#3498db',
         showSelectedLanguage = false,
         spareKey = '',
+        specifiedFieldsOnly = false,
         tabKey = ''
     }) => ({
         acceptColor,
@@ -79,11 +89,12 @@ $.fn.keyboard = function (passedOptions) {
         keyCharacterRegex,
         keyColor,
         keyTextColor,
-        language,
+        language: constructLanguageList(language),
         languageKey,
         languageKeyTextColor,
         showSelectedLanguage,
         spareKey,
+        specifiedFieldsOnly,
         tabKey
     });
 
@@ -98,12 +109,6 @@ $.fn.keyboard = function (passedOptions) {
         max: '',
         placeholder: ''
     };
-
-    //*****Quick cleanup of our language array.*****
-    options.language = options.language.split(',');
-    $.each(options.language, function (i, val) {
-        options.language[i] = val.trim();
-    });
 
     //***********************************************************************************
     //*             Return our selected input types as a formatted string.              *
@@ -133,17 +138,27 @@ $.fn.keyboard = function (passedOptions) {
     init();
 
     function init() {
-
-        languageArrayPosition = 0;
-
-        readKeyboardFile(options.language[languageArrayPosition]);
+        readKeyboardFile();
 
         //*****Add our event listeners once everything has been materialized.*****
         pageElement.on('click touch', options.inputType, function () {
+            const {
+                specifiedFieldsOnly
+            } = options;
+
             if ($(this).prop('class') != 'keyboard-input-field') {
+                const tempElement = $(this);
+
+                // Check if we're only allowing the keyboard on certain fields.
+                if (specifiedFieldsOnly) {
+                    const isTriggerField = tempElement.data(TRIGGER_KEYBOARD_FLAG) || false;
+
+                    if (!isTriggerField) {
+                        return;
+                    }
+                }
 
                 //*****Let's capture a few attributes about our input field.*****
-                var tempElement = $(this);
                 $.each(inputAttributes, function (i) {
                     inputAttributes[i] = tempElement.prop(i) === undefined ? '' : tempElement.prop(i);
                 });
@@ -207,7 +222,7 @@ $.fn.keyboard = function (passedOptions) {
                     if (!elementLayer.hasClass('keyboard-wrapper')) {
                         clearKeyboardState();
                         keyboardOpen = false;
-                        readKeyboardFile(options.language[languageArrayPosition]);
+                        readKeyboardFile();
                     }
                 }
             }
@@ -244,16 +259,30 @@ $.fn.keyboard = function (passedOptions) {
     //***********************************************************************************
     //*         Read our keyboard file and parse information into usable tables         *
     //***********************************************************************************
-    function readKeyboardFile(file) {
+    function readKeyboardFile() {
+        // Separate our language file name from mapped name.
+        const selectedLanguageFileName = () => {
+            const {
+                language
+            } = options;
+
+            const languageFileName = language[languageArrayPosition]
+                .split(LANGUAGE_MAP_SPLIT_CHAR)[0]
+                .trim();
+
+            return languageFileName;
+        };
+
+        const file = selectedLanguageFileName();
+
         if (storedKeyboardObject.keyboardFile != '' && storedKeyboardObject.arrayPosition == languageArrayPosition) {
             parseKeyboardFile(file, storedKeyboardObject.keyboardFile);
         } else {
-            $.get('languages/' + file + '.klc', function (data) {
+            $.get(`./languages/${file}.klc`, (data) => {
                 storedKeyboardObject.keyboardFile = data;
                 storedKeyboardObject.arrayPosition = languageArrayPosition;
                 parseKeyboardFile(file, data);
             });
-
         }
     }
 
@@ -447,9 +476,27 @@ $.fn.keyboard = function (passedOptions) {
             showSelectedLanguage
         } = options;
 
-        const prettifiedLanguage = ((language[languageArrayPosition]).toLowerCase()).replace(/^\w/, c => c.toUpperCase());
+        // Check if we have mapped language names, otherwise just use file name.
+        const generateLanguageName = () => {
+            const extractedLanguage = language[languageArrayPosition].split(LANGUAGE_MAP_SPLIT_CHAR);
 
-        const languageButtonText = showSelectedLanguage ? prettifiedLanguage : 'Language';
+            let languageName = '';
+
+            switch (extractedLanguage.length) {
+                case 1:
+                    languageName = extractedLanguage[0].toLowerCase().replace(/^\w/, c => c.toUpperCase());
+                    break;
+                case 2:
+                    languageName = extractedLanguage[1].trim();
+                    break;
+                default:
+                    languageName = LANGUAGE_KEY_DEFAULT;
+            }
+
+            return languageName;
+        };
+
+        const languageButtonText = showSelectedLanguage ? generateLanguageName() : LANGUAGE_KEY_DEFAULT;
 
         if (!$('.keyboard-action-wrapper').length && !options.directEnter) {
             $('.keyboard-wrapper').prepend('<div class="keyboard-action-wrapper"><button class="keyboard-action-button keyboard-cancel-button">Cancel</button><input type="text" class="keyboard-input-field"><button class="keyboard-action-button keyboard-accept-button">Accept</button></div>');
@@ -648,7 +695,7 @@ $.fn.keyboard = function (passedOptions) {
                         languageArrayPosition = 0;
                     }
                     clearKeyboardState();
-                    readKeyboardFile(options.language[languageArrayPosition]);
+                    readKeyboardFile();
                     //User-definable callback.
                     if (options.languageKey && typeof (options.languageKey) === 'function') {
                         options.languageKey();
@@ -708,7 +755,7 @@ $.fn.keyboard = function (passedOptions) {
         keyboardStreamField.val('');
         clearKeyboardState();
         keyboardOpen = false;
-        readKeyboardFile(options.language[languageArrayPosition]);
+        readKeyboardFile();
     }
 
     //***********************************************************************************
@@ -723,7 +770,7 @@ $.fn.keyboard = function (passedOptions) {
         keyboardStreamField.val('');
         clearKeyboardState();
         keyboardOpen = false;
-        readKeyboardFile(options.language[languageArrayPosition]);
+        readKeyboardFile();
     }
 
     //***********************************************************************************
@@ -793,7 +840,7 @@ $.fn.keyboard = function (passedOptions) {
         if (!resizeTimerActive) {
             resizeTimerActive = true;
             setTimeout(function () {
-                readKeyboardFile(options.language[languageArrayPosition]);
+                readKeyboardFile();
                 resizeTimerActive = false;
             }, 500);
         }

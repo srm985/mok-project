@@ -8,7 +8,7 @@
     <script type="text/javascript">
         $(document).ready(function () {
             $(document).keyboard({
-                language: 'us, arabic, vietnamese, hindi',
+                language: 'us:English, arabic:العَرَبِيَّة, vietnamese:tiếng Việt, hindi:हिन्दी',
                 enterKey: function () {
                     alert('Hey there! This is a callback function example.');
                 },
@@ -38,6 +38,11 @@
     <input type="tel" name="" readonly>
     <label>Phone Disabled:</label>
     <input type="tel" name="" disabled>
+    <br>
+    <br>
+    <br>
+    <label>Enabled Input:</label>
+    <input type="text" name="" data-trigger-keyboard="true">
     <br>
     <br>
     <br>
