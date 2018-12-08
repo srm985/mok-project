@@ -34,9 +34,12 @@ $.fn.keyboard = function (passedOptions) {
         keyboardInputType = 'text',
         keyboardStreamField;
 
+    const KEYBOARD_VERSION = '1.1.5';
     const LANGUAGE_KEY_DEFAULT = 'Language';
     const LANGUAGE_MAP_SPLIT_CHAR = ':';
     const TRIGGER_KEYBOARD_FLAG = 'triggerKeyboard';
+
+    const CDN_LANGUAGES_DIRECTORY = `https://cdn.jsdelivr.net/npm/mok-project@${KEYBOARD_VERSION}/dist/languages`;
 
     // Build out our language list from input string.
     const constructLanguageList = (language) =>
@@ -278,10 +281,21 @@ $.fn.keyboard = function (passedOptions) {
         if (storedKeyboardObject.keyboardFile != '' && storedKeyboardObject.arrayPosition == languageArrayPosition) {
             parseKeyboardFile(file, storedKeyboardObject.keyboardFile);
         } else {
-            $.get(`./languages/${file}.klc`, (data) => {
+            // Handle our keyboard file once successfully read.
+            const handleSuccess = (data) => {
                 storedKeyboardObject.keyboardFile = data;
                 storedKeyboardObject.arrayPosition = languageArrayPosition;
                 parseKeyboardFile(file, data);
+            };
+
+            // See if there is a local language file, otherwise default to CDN.
+            $.get(`./languages/${file}.klc`).done((data) => {
+                handleSuccess(data);
+            }).fail(() => {
+                // No local languages, try the CDN.
+                $.get(`${CDN_LANGUAGES_DIRECTORY}/${file}.klc`, (data) => {
+                    handleSuccess(data);
+                });
             });
         }
     }
