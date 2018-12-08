@@ -12,8 +12,8 @@ Latest Version
 
 Current Version
 ```sh
-<script src="https://cdn.jsdelivr.net/npm/mok-project@1.1.4/dist/main.js"></script>
-<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/mok-project@1.1.4/dist/styles.css">
+<script src="https://cdn.jsdelivr.net/npm/mok-project@1.1.5/dist/main.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/mok-project@1.1.5/dist/styles.css">
 ```
 
 _If no local languages file is found, the keyboard will pull languages from the CDN._

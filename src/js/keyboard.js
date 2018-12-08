@@ -34,7 +34,7 @@ $.fn.keyboard = function (passedOptions) {
         keyboardInputType = 'text',
         keyboardStreamField;
 
-    const KEYBOARD_VERSION = '1.1.4';
+    const KEYBOARD_VERSION = '1.1.5';
     const LANGUAGE_KEY_DEFAULT = 'Language';
     const LANGUAGE_MAP_SPLIT_CHAR = ':';
     const TRIGGER_KEYBOARD_FLAG = 'triggerKeyboard';
