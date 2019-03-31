@@ -14,25 +14,33 @@
 //***********************************************************************************
 
 $.fn.keyboard = function (passedOptions) {
+    const rtlLanguages = [
+        'ar-SA',
+        'fa-IR',
+        'he-IL',
+        'ur-PK'
+    ];
 
-    var keyMap = { '29': 0, '02': 1, '03': 2, '04': 3, '05': 4, '06': 5, '07': 6, '08': 7, '09': 8, '0a': 9, '0b': 10, '0c': 11, '0d': 12, '10': 13, '11': 14, '12': 15, '13': 16, '14': 17, '15': 18, '16': 19, '17': 20, '18': 21, '19': 22, '1a': 23, '1b': 24, '2b': 25, '1e': 26, '1f': 27, '20': 28, '21': 29, '22': 30, '23': 31, '24': 32, '25': 33, '26': 34, '27': 35, '28': 36, '2c': 37, '2d': 38, '2e': 39, '2f': 40, '30': 41, '31': 42, '32': 43, '33': 44, '34': 45, '35': 46 },
-        keyStatusObject = { shift: false, caps: false, altgrp: false, shift_altgrp: '' },
-        pageElement = $(this),
-        focusedInputField,
-        resizeTimerActive = false,
-        languageArrayPosition = 0,
-        storedKeyboardObject = { keyboardFile: '', arrayPosition: '' },
-        shiftStateObject,
-        deadkeyObject,
-        ligatureObject,
-        deadkeyPressed = '',
-        deadkeySet = false,
-        textFlowDirection = 'LTR',
-        keyboardOpen = false,
-        keyboardWrapperPresent = false,
-        inputFieldType = 'text',
-        keyboardInputType = 'text',
-        keyboardStreamField;
+    let keyMap = { '29': 0, '02': 1, '03': 2, '04': 3, '05': 4, '06': 5, '07': 6, '08': 7, '09': 8, '0a': 9, '0b': 10, '0c': 11, '0d': 12, '10': 13, '11': 14, '12': 15, '13': 16, '14': 17, '15': 18, '16': 19, '17': 20, '18': 21, '19': 22, '1a': 23, '1b': 24, '2b': 25, '1e': 26, '1f': 27, '20': 28, '21': 29, '22': 30, '23': 31, '24': 32, '25': 33, '26': 34, '27': 35, '28': 36, '2c': 37, '2d': 38, '2e': 39, '2f': 40, '30': 41, '31': 42, '32': 43, '33': 44, '34': 45, '35': 46 };
+
+    let deadkeyObject;
+    let deadkeyPressed = '';
+    let deadkeySet = false;
+    let focusedInputField;
+    let inputFieldType = 'text';
+    let keyStatusObject = { shift: false, caps: false, altgrp: false, shift_altgrp: '' };
+    let keyboardInputType = 'text';
+    let keyboardOpen = false;
+    let keyboardStreamField;
+    let keyboardWrapperPresent = false;
+    let languageArrayPosition = 0;
+    let ligatureObject;
+    let localeName = '';
+    let pageElement = $(this);
+    let resizeTimerActive = false;
+    let shiftStateObject;
+    let storedKeyboardObject = { keyboardFile: '', arrayPosition: '' };
+    let textFlowDirection = 'LTR';
 
     const KEYBOARD_VERSION = '1.1.5';
     const LANGUAGE_KEY_DEFAULT = 'Language';
@@ -322,6 +330,13 @@ $.fn.keyboard = function (passedOptions) {
         data = data.replace(/\u0000/g, '');
         keyData = data.match(/\d(\w)?\s+\w+\s+\d\s+(-1|\w+@?|%%)\s+(-1|\w+@?|%%)\s+(-1|\w+@?|%%)(\s+(-1|\w+@?|%%))?(\s+(-1|\w+@?|%%))?(\s+(-1|\w+@?|%%))?\s+\/\//g);
 
+        const [
+            extractedLocaleName
+        ] = data.match(/LOCALENAME\s+".*"/);
+
+        // Storing our locale name so that we can set certain language attributes.
+        localeName = extractedLocaleName.replace(/LOCALENAME\s+"(.*)"/, '$1');
+
         //*****Extract our shift state data and convert to lookup table.*****
         shiftStateLocation = data.indexOf('SHIFTSTATE');
         if (shiftStateLocation > 0) {
@@ -385,7 +400,7 @@ $.fn.keyboard = function (passedOptions) {
         }
 
         //*****Reverse input direction for specific languages.*****
-        if (file == 'arabic') {
+        if (rtlLanguages.includes(localeName)) {
             textFlowDirection = 'RTL';
         } else {
             textFlowDirection = 'LTR';
