@@ -306,3 +306,7 @@ In this release I have addressed several issues related to how the keyboard hand
 #### Version 1.1.5
 
 * Revised code to search local languages first, then pull from CDN.
+
+#### Version 1.1.6
+
+* Corrected .klc file name typo of "azeri-lstin" -> "azeri-latin". Left mispelled file also for legacy support.

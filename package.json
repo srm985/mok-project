@@ -1,6 +1,6 @@
 {
   "name": "mok-project",
-  "version": "1.1.5",
+  "version": "1.1.6",
   "description": "A jQuery plugin providing multilingual onscreen keyboard for terminals and kiosks.",
   "main": "index.js",
   "scripts": {
@@ -28,12 +28,12 @@
   },
   "homepage": "https://github.com/srm985/mok-project#readme",
   "devDependencies": {
-    "@babel/core": "^7.2.0",
-    "@babel/preset-env": "^7.2.0",
+    "@babel/core": "^7.4.0",
+    "@babel/preset-env": "^7.4.0",
     "babel-core": "^6.26.3",
     "babel-preset-es2015": "^6.24.1",
     "browser-sync": "^2.26.3",
-    "del": "^3.0.0",
+    "del": "^4.0.0",
     "gulp": "^3.9.1",
     "gulp-autoprefixer": "^6.0.0",
     "gulp-babel": "^8.0.0",
@@ -46,7 +46,8 @@
     "gulp-sass": "^4.0.2",
     "gulp-sass-lint": "^1.4.0",
     "gulp-sequence": "^1.0.0",
-    "gulp-sourcemaps": "^2.6.1",
-    "gulp-uglify": "^3.0.1"
+    "gulp-sourcemaps": "^2.6.5",
+    "gulp-uglify": "^3.0.2",
+    "natives": "^1.1.6"
   }
 }
