@@ -7,7 +7,7 @@
 //*            GitHub: https://github.com/srm985/mok-project                        *
 //*                                                                                 *
 //*            Started: March 2017                                                  *
-//*            Version: 1.1.3                                                         *
+//*            Version: 1.1.6                                                         *
 //*                                                                                 *
 //*            License: MIT (https://opensource.org/licenses/MIT)                   *
 //*                                                                                 *
@@ -42,7 +42,7 @@ $.fn.keyboard = function (passedOptions) {
     let storedKeyboardObject = { keyboardFile: '', arrayPosition: '' };
     let textFlowDirection = 'LTR';
 
-    const KEYBOARD_VERSION = '1.1.5';
+    const KEYBOARD_VERSION = '1.1.6';
     const LANGUAGE_KEY_DEFAULT = 'Language';
     const LANGUAGE_MAP_SPLIT_CHAR = ':';
     const TRIGGER_KEYBOARD_FLAG = 'triggerKeyboard';
