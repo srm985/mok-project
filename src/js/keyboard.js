@@ -7,7 +7,7 @@
 //*            GitHub: https://github.com/srm985/mok-project                        *
 //*                                                                                 *
 //*            Started: March 2017                                                  *
-//*            Version: 1.1.6                                                         *
+//*            Version: 1.1.7                                                       *
 //*                                                                                 *
 //*            License: MIT (https://opensource.org/licenses/MIT)                   *
 //*                                                                                 *
@@ -42,7 +42,7 @@ $.fn.keyboard = function (passedOptions) {
     let storedKeyboardObject = { keyboardFile: '', arrayPosition: '' };
     let textFlowDirection = 'LTR';
 
-    const KEYBOARD_VERSION = '1.1.6';
+    const KEYBOARD_VERSION = '1.1.7';
     const LANGUAGE_KEY_DEFAULT = 'Language';
     const LANGUAGE_MAP_SPLIT_CHAR = ':';
     const TRIGGER_KEYBOARD_FLAG = 'triggerKeyboard';
@@ -70,6 +70,7 @@ $.fn.keyboard = function (passedOptions) {
         enterKey = '',
         inputFieldRegex = { number: /^(-)?(((\d+)|(\d+\.(\d+)?)|(\.(\d+)?))([eE]([-+])?(\d+)?)?)?$/ },
         inputType = '',
+        isPermanentUppercase = false,
         keyCharacterRegex = { number: /[0-9]|[eE]|\.|\+|-/, tel: /[0-9]|\.|\+|-|#|\(|\)/ },
         keyColor = '#E0E0E0',
         keyTextColor = '#555555',
@@ -96,6 +97,7 @@ $.fn.keyboard = function (passedOptions) {
         enterKey,
         inputFieldRegex,
         inputType: setInputType(inputType),
+        isPermanentUppercase,
         keyboardPosition,
         keyCharacterRegex,
         keyColor,
@@ -532,7 +534,7 @@ $.fn.keyboard = function (passedOptions) {
         }
         $('.keyboard-row:eq(0)').append('<button class="keyboard-key keyboard-key-lg" data-keyval="backspace">Backspace</button>');
         $('.keyboard-row:eq(1)').prepend('<button class="keyboard-key keyboard-key-lg" data-keyval="tab">Tab</button>');
-        $('.keyboard-row:eq(2)').prepend('<button class="keyboard-key keyboard-key-lg caps-lock-key" data-keyval="caps lock">Caps Lock</button>');
+        $('.keyboard-row:eq(2)').prepend(`<button class="keyboard-key keyboard-key-lg caps-lock-key ${options.isPermanentUppercase ? 'caps-lock-key-active' : ''}" data-keyval="caps lock">Caps Lock</button>`);
         $('.keyboard-row:eq(2)').append('<button class="keyboard-key keyboard-key-lg" data-keyval="enter">Enter</button>');
         $('.keyboard-row:eq(3)').prepend('<button class="keyboard-key keyboard-key-lg" data-keyval="shift">Shift</button>');
         $('.keyboard-row:eq(3)').append('<button class="keyboard-key keyboard-key-lg" data-keyval="shift">Shift</button>');
@@ -582,14 +584,14 @@ $.fn.keyboard = function (passedOptions) {
             tempString = '';
 
         //*****Set keyboard to default and capitalize letters.*****
-        if (keyStatusObject.caps && !keyStatusObject.shift && !keyStatusObject.altgrp) {
+        if (keyStatusObject.caps && !keyStatusObject.shift && !keyStatusObject.altgrp && !options.isPermanentUppercase) {
             keyType = 'default';
             $('.caps-lock-key').addClass('caps-lock-key-active');
         } else if (!keyStatusObject.caps && !keyStatusObject.shift && !keyStatusObject.altgrp) {
             keyType = 'default';
         }
 
-        if (!keyStatusObject.caps) {
+        if (!keyStatusObject.caps && !options.isPermanentUppercase) {
             $('.caps-lock-key').removeClass('caps-lock-key-active');
         }
 
@@ -623,7 +625,7 @@ $.fn.keyboard = function (passedOptions) {
                     currentKey.data('keyval', currentKey.html());
                 }
 
-                if (!keyStatusObject.shift && keyStatusObject.caps && !keyStatusObject.altgrp) {
+                if ((!keyStatusObject.shift && keyStatusObject.caps && !keyStatusObject.altgrp) || options.isPermanentUppercase) {
                     currentKey.html(currentKey.html().length == 1 ? currentKey.html().toUpperCase() : currentKey.html());
                     currentKey.data('keyval', currentKey.html().length == 1 ? currentKey.html() : currentKey.data('keyval'));
                 }
