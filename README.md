@@ -12,7 +12,7 @@ Latest Version
 
 Current Version
 ```sh
-<script src="https://cdn.jsdelivr.net/npm/mok-project@1.1.5/dist/main.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mok-project@1.1.7/dist/main.js"></script>
 <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/mok-project@1.1.5/dist/styles.css">
 ```
 
@@ -97,6 +97,7 @@ This project was built and tested on jQuery 3.2 and is fed .klc files from [Micr
 | cancelTextColor | '#FFFFFF' | Defines text color of cancel button. May pass hex string or specific color i.e. 'white'. |
 | inputFieldRegex | { number: /^(-)?(((&#92;d+)&#124;(&#92;d+&#92;.(&#92;d+)?)&#124;(&#92;.(&#92;d+)?))([eE]([-+])?(&#92;d+)?)?)?$/ } | Define regular expressions for the accepted patterns of input field types. These patterns serve to further restrict browser-specific prepopulated patterns. For example, you may NOT generate a regex to allow letters in an input[type="number"]. Ensure these are whole pattern matches handled by the prepension and appension of ^ and $. The object keys must match identically to the input type. |
 | inputType | 'text, textarea, number, password, search, tel, url, contenteditable' | May pass individual input types or comma-separated values. |
+| isPermanentUppercase | false | When set true, the caps lock button will remain enabled permanently. |
 | keyCharacterRegex | { number: /[0-9]&#124;[eE]&#124;&#92;.&#124;&#92;+&#124;&#92;-/, tel: /[0-9]&#124;&#92;.&#124;&#92;+&#124;&#92;-&#124;&#92;#&#124;&#92;(&#124;&#92;)/ } | Define regular expressions for input field types. These pertain to the individual key pressed, not the whole accepted pattern. The object keys must match identically to the input type. |
 | keyColor | '#E0E0E0' | Defines background color of keys. May pass hex string or specific color i.e. 'blue'. |
 | keyTextColor | '#555555' | Defines text color used on keys. May pass hex string or specific color i.e. 'blue'. |
@@ -310,3 +311,7 @@ In this release I have addressed several issues related to how the keyboard hand
 #### Version 1.1.6
 
 * Corrected .klc file name typo of "azeri-lstin" -> "azeri-latin". Left mispelled file also for legacy support.
+
+#### Version 1.1.7
+
+* Added feature to allow permanent caps lock functionality.
